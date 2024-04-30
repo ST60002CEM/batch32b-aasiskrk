@@ -1,6 +1,6 @@
 {
-    "name": "gamershub",
-    "short_name": "gamershub",
+    "name": "playforge",
+    "short_name": "playforge",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

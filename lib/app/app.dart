@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gamershub/screens/login_screen.dart';
+import 'package:playforge/screens/login_screen.dart';
 
 class App extends StatelessWidget {
   const App({super.key});

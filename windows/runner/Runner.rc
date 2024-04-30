@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.aashista.gamershub" "\0"
-            VALUE "FileDescription", "gamershub" "\0"
+            VALUE "CompanyName", "com.aashista.playforge" "\0"
+            VALUE "FileDescription", "playforge" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "gamershub" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2024 com.aashista.gamershub. All rights reserved." "\0"
-            VALUE "OriginalFilename", "gamershub.exe" "\0"
-            VALUE "ProductName", "gamershub" "\0"
+            VALUE "InternalName", "playforge" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2024 com.aashista.playforge. All rights reserved." "\0"
+            VALUE "OriginalFilename", "playforge.exe" "\0"
+            VALUE "ProductName", "playforge" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gamershub/app/app.dart';
+import 'package:playforge/app/app.dart';
 
 void main() {
   runApp(const MyApp());

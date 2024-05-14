@@ -40,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Theme.of(context).cardColor),
-                    child: const Padding(
+                    child: Padding(
                       padding:
                           EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                       child: Column(
@@ -60,15 +60,40 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),
+                          TextFormField(
+                            validator: (value) {},
+                          ),
+                          TextFormField(
+                            validator: (value) {},
+                          ),
+                          ElevatedButton(
+                            onPressed: () {},
+                            child: Text("Log In"),
+                          ),
+                          TextButton(
+                              onPressed: () {},
+                              child: Text("Forgot Password?")),
+                          Row(
+                            children: [
+                              Text("Don't have an account?"),
+                              TextButton(
+                                onPressed: () {},
+                                child: Text("Sign Up"),
+                              )
+                            ],
+                          ),
+                          ElevatedButton.icon(
+                            style: ButtonStyle(),
+                            onPressed: () {},
+                            icon: Icon(Icons.gpp_good_rounded),
+                            label: Text("Sign In with Google"),
+                          )
                           // Add other login elements here
                         ],
                       ),
                     ),
                   ),
                 ),
-                TextFormField(
-                  validator: (value) {},
-                )
               ],
             ),
           ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:playforge/screens/login_screen.dart';
+import 'package:playforge/screens/register_screen.dart';
+import 'package:playforge/screens/splash_screen.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -22,7 +24,7 @@ class App extends StatelessWidget {
         useMaterial3: true,
         // colorSchemeSeed: Colors.lightGreen
       ),
-      home: LoginScreen(),
+      home: RegisterScreen(),
     );
   }
 }

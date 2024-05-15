@@ -62,14 +62,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_adaptive_scaffold:
-    dependency: "direct dev"
-    description:
-      name: flutter_adaptive_scaffold
-      sha256: "9a1d5e9f728815e27b7b612883db19107ba8a35a46a97c757ea00896cb027451"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.10+2"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -218,4 +210,3 @@ packages:
     version: "13.0.0"
 sdks:
   dart: ">=3.3.4 <4.0.0"
-  flutter: ">=3.13.0"

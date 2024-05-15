@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:playforge/common/custom_elevated_button.dart';
 import 'package:playforge/common/cutom_textform_field.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -18,135 +19,208 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromRGBO(27, 27, 27, 1),
-      resizeToAvoidBottomInset: false,
-      body: Padding(
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-        child: Column(
-          children: [
-            Expanded(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Image.asset(
-                  'assets/images/logowhite.png',
-                  width: MediaQuery.of(context).size.width *
-                      0.4, // Adjust size as needed
-                  height: MediaQuery.of(context).size.width *
-                      0.4, // Adjust size as needed
-                ),
-              ),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: const Color.fromRGBO(27, 27, 27, 1),
+        body: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            if (constraints.maxWidth < 600) {
+              // Mobile layout
+              return _buildMobileLayout();
+            } else {
+              // Tablet layout
+              return _buildTabletLayout();
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileLayout() {
+    return Column(
+      children: [
+        Expanded(
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Image.asset(
+              'assets/images/logowhite.png',
+              width: MediaQuery.of(context).size.width *
+                  0.4, // Adjust size as needed
+              height: MediaQuery.of(context).size.width *
+                  0.4, // Adjust size as needed
             ),
-            Container(
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+            child: Container(
+              alignment: Alignment.center,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(20),
                 color: Theme.of(context).cardColor,
               ),
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text(
-                      "Create an account",
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontFamily: "Epilogue",
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -0.3,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 20),
-                    CustomTextFormField(
-                      textStyle: TextStyle(color: Colors.black),
-                      prefixIconData: Icons.person,
-                      controller: nameFieldController,
-                      hintText: 'Enter your name',
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Please enter your name';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 10),
-                    CustomTextFormField(
-                      textStyle: TextStyle(color: Colors.black),
-                      prefixIconData: Icons.email,
-                      controller: emailFieldController,
-                      hintText: 'Enter your email',
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Please enter an email address';
-                        } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                            .hasMatch(value)) {
-                          return 'Please enter a valid email address';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 10),
-                    CustomTextFormField(
-                      textStyle: TextStyle(color: Colors.black),
-                      obscureText: true,
-                      prefixIconData: Icons.password,
-                      controller: passwordFieldController,
-                      hintText: 'Enter your password',
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Please enter a password';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 10),
-                    CustomTextFormField(
-                      textStyle: TextStyle(color: Colors.black),
-                      obscureText: true,
-                      prefixIconData: Icons.password,
-                      controller: confirmPasswordFieldController,
-                      hintText: 'Confirm password',
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Please confirm your password';
-                        } else if (value != passwordFieldController.text) {
-                          return 'Passwords do not match';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: Text("Sign Up"),
-                    ),
-                    SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Already have an account?",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              print("Signed in");
-                            } else {
-                              print("Put all fields");
-                            }
-                          },
-                          child: Text("Log In",
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              child: _buildForm(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTabletLayout() {
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Image.asset(
+              'assets/images/logowhite.png',
+              width: MediaQuery.of(context).size.width, // Adjust size as needed
+              height: MediaQuery.of(context).size.width *
+                  0.3, // Adjust size as needed
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+            height: MediaQuery.of(context)
+                .size
+                .height, // Make container span full height
+            child: _buildForm(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildForm() {
+    return SingleChildScrollView(
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              "Create an account",
+              style: TextStyle(
+                fontSize: 32,
+                fontFamily: "Epilogue",
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                letterSpacing: -0.3,
               ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            CustomTextFormField(
+              textStyle: const TextStyle(color: Colors.black),
+              prefixIconData: Icons.person,
+              controller: nameFieldController,
+              hintText: 'Enter your name',
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter your name';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 10),
+            CustomTextFormField(
+              textStyle: const TextStyle(color: Colors.black),
+              prefixIconData: Icons.email,
+              controller: emailFieldController,
+              hintText: 'Enter your email',
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter an email address';
+                } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                    .hasMatch(value)) {
+                  return 'Please enter a valid email address';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 10),
+            CustomTextFormField(
+              textStyle: const TextStyle(color: Colors.black),
+              obscureText: true,
+              prefixIconData: Icons.password,
+              controller: passwordFieldController,
+              hintText: 'Enter your password',
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter a password';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 10),
+            CustomTextFormField(
+              textStyle: const TextStyle(color: Colors.black),
+              obscureText: true,
+              prefixIconData: Icons.password,
+              controller: confirmPasswordFieldController,
+              hintText: 'Confirm password',
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please confirm your password';
+                } else if (value != passwordFieldController.text) {
+                  return 'Passwords do not match';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 20),
+            CustomElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  print("Signed in");
+                } else {
+                  print("Put all fields");
+                }
+              },
+              text: 'Sign Up',
+              textStyle: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'Genera'),
+            ),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     if (_formKey.currentState!.validate()) {
+            //       print("Signed in");
+            //     } else {
+            //       print("Put all fields");
+            //     }
+            //   },
+            //   child: Text("Sign Up"),
+            // ),
+            const SizedBox(height: 5),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Already have an account?",
+                  style: TextStyle(color: Colors.white),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text("Log In",
+                      style: TextStyle(color: Colors.white)),
+                ),
+              ],
             ),
           ],
         ),

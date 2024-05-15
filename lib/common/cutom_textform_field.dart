@@ -40,7 +40,7 @@ class CustomTextFormField extends StatelessWidget {
             ? Icon(prefixIconData, color: Colors.grey)
             : null,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15.0),
+          borderRadius: BorderRadius.circular(20.0),
           borderSide: BorderSide.none,
         ),
       ),

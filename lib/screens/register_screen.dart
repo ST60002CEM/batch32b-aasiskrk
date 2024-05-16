@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:playforge/common/custom_elevated_button.dart';
 import 'package:playforge/common/cutom_textform_field.dart';
+import 'package:playforge/screens/login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -55,14 +56,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Expanded(
           flex: 2,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+            padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
             child: Container(
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 color: Theme.of(context).cardColor,
               ),
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 22),
               child: _buildForm(),
             ),
           ),
@@ -153,6 +154,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 10),
             CustomTextFormField(
+              enableToggle: true,
               textStyle: const TextStyle(color: Colors.black),
               obscureText: true,
               prefixIconData: Icons.password,
@@ -167,6 +169,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 10),
             CustomTextFormField(
+              enableToggle: true,
               textStyle: const TextStyle(color: Colors.black),
               obscureText: true,
               prefixIconData: Icons.password,
@@ -216,7 +219,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: TextStyle(color: Colors.white),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (_) => LoginScreen()));
+                  },
                   child: const Text("Log In",
                       style: TextStyle(color: Colors.white)),
                 ),

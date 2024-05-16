@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CustomElevatedButton extends StatelessWidget {
@@ -8,6 +7,7 @@ class CustomElevatedButton extends StatelessWidget {
   final Color color;
   final double borderRadius;
   final double height;
+  final Image? image; // New image parameter
 
   const CustomElevatedButton({
     Key? key,
@@ -16,7 +16,8 @@ class CustomElevatedButton extends StatelessWidget {
     this.textStyle,
     this.color = const Color.fromRGBO(48, 255, 81, 40),
     this.borderRadius = 15.0,
-    this.height = 60.0,
+    this.height = 58.0,
+    this.image, // New image parameter
   }) : super(key: key);
 
   @override
@@ -30,15 +31,30 @@ class CustomElevatedButton extends StatelessWidget {
       child: TextButton(
         onPressed: onPressed,
         style: ButtonStyle(
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(borderRadius),
             ),
           ),
         ),
-        child: Text(
-          text,
-          style: textStyle ?? TextStyle(color: Colors.white),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            if (image != null)
+              SizedBox(
+                width: 30.0, // Adjust the width as needed for the image size
+                child: image, // Display image if provided
+              ),
+            SizedBox(width: 8.0), // Add some space between image and text
+            Expanded(
+              child: Text(
+                text,
+                textAlign: TextAlign.center,
+                style: textStyle ?? TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
         ),
       ),
     );

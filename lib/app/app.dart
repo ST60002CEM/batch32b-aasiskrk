@@ -24,7 +24,7 @@ class App extends StatelessWidget {
         useMaterial3: true,
         // colorSchemeSeed: Colors.lightGreen
       ),
-      home: RegisterScreen(),
+      home: const SplashScreen(),
     );
   }
 }

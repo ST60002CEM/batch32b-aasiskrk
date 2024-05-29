@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:playforge/screens/login_screen.dart';
 import 'package:playforge/screens/register_screen.dart';
 import 'package:playforge/screens/splash_screen.dart';
+import 'package:playforge/theme/theme_data.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -11,19 +12,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.system,
-      theme: ThemeData(
-        brightness: Brightness.light,
-        primaryColor: Colors.white,
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: const Color.fromRGBO(23, 23, 23, 1),
-        cardColor: const Color.fromRGBO(0, 0, 0, 1),
-
-        useMaterial3: true,
-        // colorSchemeSeed: Colors.lightGreen
-      ),
+      theme: getApplicationTheme(),
       home: const SplashScreen(),
     );
   }

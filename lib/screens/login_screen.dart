@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:playforge/common/custom_elevated_button.dart';
+import 'package:playforge/common/custom_snackbar.dart';
 import 'package:playforge/screens/register_screen.dart';
 
 import '../common/cutom_textform_field.dart';
+import 'dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -20,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: const Color.fromRGBO(27, 27, 27, 1),
+        backgroundColor: Theme.of(context).canvasColor,
         body: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             if (constraints.maxWidth < 600) {
@@ -43,7 +45,9 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Align(
             alignment: Alignment.bottomCenter,
             child: Image.asset(
-              'assets/images/logowhite.png',
+              Theme.of(context).brightness == Brightness.dark
+                  ? 'assets/images/logowhite.png'
+                  : 'assets/images/logoblack.png',
               width: MediaQuery.of(context).size.width *
                   0.4, // Adjust size as needed
               height: MediaQuery.of(context).size.width *
@@ -83,6 +87,18 @@ class _LoginScreenState extends State<LoginScreen> {
             child: _buildForm(),
           ),
         ),
+        Expanded(
+          flex: 1,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Image.asset(
+              'assets/images/logowhite.png',
+              width: MediaQuery.of(context).size.width, // Adjust size as needed
+              height: MediaQuery.of(context).size.width *
+                  0.3, // Adjust size as needed
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -105,9 +121,9 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 10),
             CustomTextFormField(
-              prefixIconData: Icons.email_outlined,
+              prefixIconData: Icons.person,
               textStyle: const TextStyle(color: Colors.black),
               controller: emailFieldController,
               hintText: 'Enter your email',
@@ -135,9 +151,20 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 20),
             CustomElevatedButton(
+              color: Color.fromRGBO(8, 113, 237, 1),
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   print("Logged in");
+                  showCustomSnackBar(
+                    context,
+                    'Loggged In',
+                    textStyle: TextStyle(
+                        color: Colors.green,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900),
+                  );
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => const DashboardScreen()));
                 }
               },
               text: 'Log In',
@@ -158,12 +185,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
                         builder: (_) => const RegisterScreen()));
                   },
                   child: const Text(
                     "Sign Up",
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Color.fromRGBO(48, 255, 81, 40)),
                   ),
                 ),
               ],

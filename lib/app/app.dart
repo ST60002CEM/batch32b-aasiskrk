@@ -13,6 +13,7 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.system,
       theme: getApplicationTheme(),
+      darkTheme: getDarkTheme(),
       home: const SplashScreen(),
     );
   }

@@ -22,7 +22,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: const Color.fromRGBO(27, 27, 27, 1),
+        backgroundColor: Theme.of(context).canvasColor,
         body: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             if (constraints.maxWidth < 600) {
@@ -45,7 +45,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Align(
             alignment: Alignment.bottomCenter,
             child: Image.asset(
-              'assets/images/logowhite.png',
+              Theme.of(context).brightness == Brightness.dark
+                  ? 'assets/images/logowhite.png'
+                  : 'assets/images/logoblack.png',
               width: MediaQuery.of(context).size.width *
                   0.4, // Adjust size as needed
               height: MediaQuery.of(context).size.width *
@@ -123,7 +125,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             CustomTextFormField(
               textStyle: const TextStyle(color: Colors.black),
               prefixIconData: Icons.person,
@@ -210,7 +212,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             //   },
             //   child: Text("Sign Up"),
             // ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -220,11 +222,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (_) => LoginScreen()));
+                    Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (_) => LoginScreen()));
                   },
                   child: const Text("Log In",
-                      style: TextStyle(color: Colors.white)),
+                      style: TextStyle(color: Colors.blue)),
                 ),
               ],
             ),

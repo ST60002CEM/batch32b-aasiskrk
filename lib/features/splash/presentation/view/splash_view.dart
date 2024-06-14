@@ -1,27 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../viewmodel/splash_view_model.dart';
 
-import 'login_screen.dart';
-
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+class SplashView extends ConsumerStatefulWidget {
+  const SplashView({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashView> createState() => _SplashViewState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashViewState extends ConsumerState<SplashView> {
   @override
   void initState() {
     super.initState();
-    // Wait for 5 seconds, then navigate to LoginScreen
-    Future.delayed(Duration(seconds: 5), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
-      );
+    // Trigger the openLoginView method from the ViewModel
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(splashViewModelProvider.notifier).openLoginView();
     });
   }
 
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
@@ -60,10 +58,10 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
               ),
             ),
-            Align(
+            const Align(
               alignment: Alignment.topRight,
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: EdgeInsets.all(20.0),
                 child: CircularProgressIndicator(
                   backgroundColor: Colors.grey,
                   strokeWidth: 4,

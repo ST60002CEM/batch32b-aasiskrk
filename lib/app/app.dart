@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:playforge/app/navigator_key/navigator_key.dart';
-import 'package:playforge/screens/splash_screen.dart';
+import 'package:playforge/features/splash/presentation/view/splash_view.dart';
 import 'package:playforge/app/theme/theme_data.dart';
 
 class App extends ConsumerWidget {
@@ -15,7 +15,7 @@ class App extends ConsumerWidget {
       themeMode: ThemeMode.system,
       theme: getApplicationTheme(),
       darkTheme: getDarkTheme(),
-      home: const SplashScreen(),
+      home: const SplashView(),
     );
   }
 }

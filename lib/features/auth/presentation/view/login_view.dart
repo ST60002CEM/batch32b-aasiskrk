@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:playforge/core/common/custom_elevated_button.dart';
 import 'package:playforge/core/common/custom_snackbar.dart';
-import 'package:playforge/screens/register_screen.dart';
+import 'package:playforge/features/auth/presentation/view/register_view.dart';
+import 'package:playforge/features/auth/presentation/viewmodel/auth_view_model.dart';
 
-import '../core/common/cutom_textform_field.dart';
-import 'dashboard_screen.dart';
+import '../../../../core/common/cutom_textform_field.dart';
+import '../../../dashboard/presentation/view/dashboard_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class LoginView extends ConsumerStatefulWidget {
+  const LoginView({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginView> createState() => _LoginViewState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginViewState extends ConsumerState<LoginView> {
   TextEditingController emailFieldController = TextEditingController();
   TextEditingController passwordFieldController = TextEditingController();
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -123,6 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 10),
             CustomTextFormField(
+              key: const ValueKey('email'),
               prefixIconData: Icons.person,
               textStyle: const TextStyle(color: Colors.black),
               controller: emailFieldController,
@@ -136,6 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 10),
             CustomTextFormField(
+              key: const ValueKey('password'),
               prefixIconData: Icons.password,
               textStyle: const TextStyle(color: Colors.black),
               obscureText: true,
@@ -152,9 +156,12 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 20),
             CustomElevatedButton(
               color: Color.fromRGBO(8, 113, 237, 1),
-              onPressed: () {
+              onPressed: () async {
                 if (_formKey.currentState!.validate()) {
-                  print("Logged in");
+                  await ref.read(authViewModelProvider.notifier).loginUser(
+                        emailFieldController.text,
+                        passwordFieldController.text,
+                      );
                   showCustomSnackBar(
                     context,
                     'Loggged In',
@@ -163,8 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontSize: 16,
                         fontWeight: FontWeight.w900),
                   );
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => const DashboardScreen()));
+                  ref.read(authViewModelProvider.notifier).openDashboardView();
                 }
               },
               text: 'Log In',
@@ -185,8 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (_) => const RegisterScreen()));
+                    ref.read(authViewModelProvider.notifier).openRegisterView();
                   },
                   child: const Text(
                     "Sign Up",

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:playforge/screens/home_screen.dart';
-import 'package:playforge/screens/notification_screen.dart';
-import 'package:playforge/screens/search_screen.dart';
-import 'package:playforge/screens/users_feed_screen.dart';
+import 'package:playforge/features/dashboard/presentation/view/home_screen.dart';
+import 'package:playforge/features/dashboard/presentation/view/notification_screen.dart';
+import 'package:playforge/features/dashboard/presentation/view/search_screen.dart';
+import 'package:playforge/features/dashboard/presentation/view/users_feed_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:playforge/core/common/custom_forum_card.dart';
-import '../core/common/custom_game_card.dart';
+import '../../../../core/common/custom_game_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);

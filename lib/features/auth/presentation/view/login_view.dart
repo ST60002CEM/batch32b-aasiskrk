@@ -162,15 +162,15 @@ class _LoginViewState extends ConsumerState<LoginView> {
                         emailFieldController.text,
                         passwordFieldController.text,
                       );
-                  showCustomSnackBar(
-                    context,
-                    'Loggged In',
-                    textStyle: TextStyle(
-                        color: Colors.green,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900),
-                  );
-                  ref.read(authViewModelProvider.notifier).openDashboardView();
+                  // ref.read(authViewModelProvider.notifier).openDashboardView();
+                  // showCustomSnackBar(
+                  //   context,
+                  //   'Loggged In',
+                  //   textStyle: TextStyle(
+                  //       color: Colors.green,
+                  //       fontSize: 16,
+                  //       fontWeight: FontWeight.w900),
+                  // );
                 }
               },
               text: 'Log In',

@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:playforge/core/common/custom_elevated_button.dart';
 import 'package:playforge/core/common/cutom_textform_field.dart';
-import 'package:playforge/screens/login_screen.dart';
+import 'package:playforge/features/auth/presentation/view/login_view.dart';
+import 'package:playforge/features/auth/presentation/viewmodel/auth_view_model.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+import '../../domain/entity/auth_entity.dart';
+
+class RegisterView extends ConsumerStatefulWidget {
+  const RegisterView({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterView> createState() => _RegisterViewState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterViewState extends ConsumerState<RegisterView> {
   TextEditingController nameFieldController = TextEditingController();
   TextEditingController emailFieldController = TextEditingController();
   TextEditingController passwordFieldController = TextEditingController();
@@ -190,9 +194,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
             CustomElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  print("Signed in");
-                } else {
-                  print("Put all fields");
+                  var user = AuthEntity(
+                    fullname: nameFieldController.text,
+                    email: emailFieldController.text,
+                    password: passwordFieldController.text,
+                  );
+                  ref.read(authViewModelProvider.notifier).registerUser(user);
                 }
               },
               text: 'Sign Up',
@@ -222,8 +229,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (_) => LoginScreen()));
+                    ref.read(authViewModelProvider.notifier).openLoginView();
                   },
                   child: const Text("Log In",
                       style: TextStyle(color: Colors.blue)),

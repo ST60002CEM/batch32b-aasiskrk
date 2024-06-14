@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:playforge/common/custom_elevated_button.dart';
-import 'package:playforge/common/custom_snackbar.dart';
+import 'package:playforge/core/common/custom_elevated_button.dart';
+import 'package:playforge/core/common/custom_snackbar.dart';
 import 'package:playforge/screens/register_screen.dart';
 
-import '../common/cutom_textform_field.dart';
+import '../core/common/cutom_textform_field.dart';
 import 'dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {

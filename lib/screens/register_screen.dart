@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:playforge/common/custom_elevated_button.dart';
-import 'package:playforge/common/cutom_textform_field.dart';
+import 'package:playforge/core/common/custom_elevated_button.dart';
+import 'package:playforge/core/common/cutom_textform_field.dart';
 import 'package:playforge/screens/login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {

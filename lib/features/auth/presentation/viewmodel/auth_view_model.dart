@@ -58,6 +58,7 @@ class AuthViewModel extends StateNotifier<AuthState> {
       (success) {
         state = state.copyWith(isLoading: false, error: null);
         showMySnackBar(message: "Successfully registered");
+        openLoginView();
       },
     );
   }
@@ -75,7 +76,7 @@ class AuthViewModel extends StateNotifier<AuthState> {
       },
       (success) {
         state = state.copyWith(isLoading: false, error: null);
-        DashboardScreen();
+        openDashboardView();
       },
     );
   }

@@ -20,6 +20,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
   TextEditingController passwordFieldController = TextEditingController();
   TextEditingController confirmPasswordFieldController =
       TextEditingController();
+  TextEditingController addressFieldController = TextEditingController();
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -159,6 +160,20 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
               },
             ),
             const SizedBox(height: 10),
+
+            CustomTextFormField(
+              textStyle: const TextStyle(color: Colors.black),
+              prefixIconData: Icons.location_on,
+              controller: addressFieldController,
+              hintText: 'Enter your address',
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter your address';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 10),
             CustomTextFormField(
               enableToggle: true,
               textStyle: const TextStyle(color: Colors.black),
@@ -198,6 +213,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                     fullname: nameFieldController.text,
                     email: emailFieldController.text,
                     password: passwordFieldController.text,
+                    address: addressFieldController.text,
                   );
                   ref.read(authViewModelProvider.notifier).registerUser(user);
                 }

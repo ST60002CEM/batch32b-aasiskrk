@@ -51,7 +51,7 @@ class CustomElevatedButton extends StatelessWidget {
               child: Text(
                 text,
                 textAlign: TextAlign.center,
-                style: textStyle ?? TextStyle(color: Colors.white),
+                style: textStyle ?? TextStyle(fontFamily: 'SilkScreen-Reg'),
               ),
             ),
           ],

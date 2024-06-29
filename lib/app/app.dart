@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:playforge/app/navigator_key/navigator_key.dart';
+import 'package:playforge/features/auth/presentation/view/internet_checker_view.dart';
 import 'package:playforge/features/splash/presentation/view/splash_view.dart';
 import 'package:playforge/app/theme/theme_data.dart';
 

@@ -4,7 +4,7 @@ class CustomForumCard extends StatelessWidget {
   final String postTitle;
   final String postImage;
   final List<String> tags;
-  final String profileImage;
+  // final String profileImage;
   final int views;
   final int upvotes;
   final int downvotes;
@@ -14,7 +14,7 @@ class CustomForumCard extends StatelessWidget {
     required this.postTitle,
     required this.postImage,
     required this.tags,
-    required this.profileImage,
+    // required this.profileImage,
     required this.views,
     required this.upvotes,
     required this.downvotes,
@@ -64,9 +64,9 @@ class CustomForumCard extends StatelessWidget {
                 SizedBox(height: 10),
                 Row(
                   children: [
-                    CircleAvatar(
-                      backgroundImage: NetworkImage(profileImage),
-                    ),
+                    // CircleAvatar(
+                    //   backgroundImage: NetworkImage(profileImage),
+                    // ),
                     SizedBox(width: 10),
                     Text(
                       'Views: $views',

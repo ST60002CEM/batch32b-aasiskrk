@@ -7,6 +7,8 @@ class ApiEndpoints {
   //static const String baseUrl = "http://localhost:3000/api/v1/";
   //static const String baseUrl = "http://192.168.4.4:3000/api/v1/";
 
+  static const limitPage = 5;
+
   // ====================== Auth Routes ======================
   static const String login = "user/login";
   static const String register = "user/create";
@@ -16,4 +18,15 @@ class ApiEndpoints {
   // static const String imageUrl = "http://10.0.2.2:5000/uploads/";
   static const String uploadImage = "auth/uploadImage";
   // static const String currentUser = "auth/getMe";
+
+  // ====================== Forum Routes ======================
+  static const String createPost = "forum/create";
+  static const String getAllForumPosts = "forum/get_all_post";
+  static const String getPagination = "forum/pagination";
+  static const String getSingleForumPost = "forum/get_single_post/";
+  static const String editPost = "forum/edit_post/";
+  static const String deletePost = "forum/delete_post/";
+  static const String addComment = "forum/add_comment/";
+  static const String deleteComment = "forum/delete_comment/";
+  static const String getDetails = "forum/getDetails/";
 }

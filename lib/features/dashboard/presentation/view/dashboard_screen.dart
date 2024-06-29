@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:playforge/features/dashboard/presentation/view/home_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:playforge/features/dashboard/presentation/view/home_view.dart';
 import 'package:playforge/features/dashboard/presentation/view/notification_screen.dart';
 import 'package:playforge/features/dashboard/presentation/view/search_screen.dart';
 import 'package:playforge/features/dashboard/presentation/view/users_feed_screen.dart';
 
-class DashboardScreen extends StatefulWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   int _selectedIndex = 0;
   List<Widget> lstBottomScreen = [
-    HomeScreen(),
+    HomeView(),
     SearchScreen(),
     UsersFeedScreen(),
     NotificationScreen(),

@@ -15,7 +15,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
     super.initState();
     // Trigger the openLoginView method from the ViewModel
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(splashViewModelProvider.notifier).openLoginView();
+      ref.read(splashViewModelProvider.notifier).checkAuthStatus();
     });
   }
 

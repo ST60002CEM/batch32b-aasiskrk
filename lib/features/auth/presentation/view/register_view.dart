@@ -18,6 +18,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
   TextEditingController nameFieldController = TextEditingController();
   TextEditingController emailFieldController = TextEditingController();
   TextEditingController passwordFieldController = TextEditingController();
+  TextEditingController phoneFieldController = TextEditingController();
   TextEditingController confirmPasswordFieldController =
       TextEditingController();
   TextEditingController addressFieldController = TextEditingController();
@@ -61,7 +62,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
           ),
         ),
         Expanded(
-          flex: 2,
+          flex: 4,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
             child: Container(
@@ -130,7 +131,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             CustomTextFormField(
               textStyle: const TextStyle(color: Colors.black),
               prefixIconData: Icons.person,
@@ -169,6 +170,20 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
               validator: (value) {
                 if (value!.isEmpty) {
                   return 'Please enter your address';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 10),
+
+            CustomTextFormField(
+              textStyle: const TextStyle(color: Colors.black),
+              prefixIconData: Icons.phone,
+              controller: phoneFieldController,
+              hintText: 'Enter your Phone Number',
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter your Phone Number';
                 }
                 return null;
               },
@@ -214,6 +229,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                     email: emailFieldController.text,
                     password: passwordFieldController.text,
                     address: addressFieldController.text,
+                    phone: phoneFieldController.text,
                   );
                   ref.read(authViewModelProvider.notifier).registerUser(user);
                 }
@@ -235,7 +251,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
             //   },
             //   child: Text("Sign Up"),
             // ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

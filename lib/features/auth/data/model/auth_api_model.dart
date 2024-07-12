@@ -20,6 +20,7 @@ class AuthApiModel {
   final String email;
   final String address;
   final String? password;
+  final String phone;
 
   AuthApiModel({
     this.id,
@@ -27,6 +28,7 @@ class AuthApiModel {
     required this.email,
     required this.address,
     required this.password,
+    required this.phone,
   });
 
   // Empty constructor
@@ -35,7 +37,8 @@ class AuthApiModel {
         fullname = '',
         email = '',
         address = '',
-        password = '';
+        password = '',
+        phone = '';
 
   factory AuthApiModel.fromJson(Map<String, dynamic> json) =>
       _$AuthApiModelFromJson(json);
@@ -50,6 +53,7 @@ class AuthApiModel {
       email: email,
       address: address,
       password: password ?? '',
+      phone: phone,
     );
   }
 
@@ -58,5 +62,6 @@ class AuthApiModel {
         email: entity.email,
         address: entity.address,
         password: entity.password,
+        phone: entity.phone,
       );
 }

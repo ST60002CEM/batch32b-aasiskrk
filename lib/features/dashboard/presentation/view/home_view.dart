@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:playforge/core/common/custom_forum_card.dart';
 import '../../../../core/common/custom_game_card.dart';
 import '../viewmodel/forum_view_model.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -39,132 +40,135 @@ class _HomeViewState extends ConsumerState<HomeView> {
         if (notification is ScrollEndNotification) {
           // Scroll garda feri last ma ho ki haina bhanera check garne ani data call garne
           if (_scrollController.position.extentAfter == 0) {
-            // Data fetch gara api bata
             ref.read(forumViewModelProvider.notifier).getAllForumPosts();
           }
         }
         return true;
       },
       child: Scaffold(
-        body: RefreshIndicator(
-          color: Colors.green,
-          backgroundColor: Colors.black,
-          onRefresh: () async {
-            await ref.read(forumViewModelProvider.notifier).resetState();
-          },
-          child: DefaultTabController(
-            length: 2, // Number of tabs
-            child: SafeArea(
-              child: Container(
-                color: Theme.of(context).canvasColor,
-                child: Column(
-                  children: [
-                    // Custom Tab Bar
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.menu),
-                            onPressed: () {
-                              // Implement your menu functionality here
-                            },
-                          ),
-                          Expanded(
-                            child: TabBar(
-                              padding: EdgeInsets.symmetric(horizontal: 60),
-                              tabAlignment: TabAlignment.fill,
-                              labelColor: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black,
-                              indicatorSize: TabBarIndicatorSize.tab,
-                              dividerColor: Theme.of(context).canvasColor,
-                              indicatorColor: Colors.green,
-                              tabs: const [
-                                Tab(text: 'Forum'),
-                                Tab(text: 'Games'),
-                              ],
+        body: SafeArea(
+          child: LiquidPullToRefresh(
+            showChildOpacityTransition: false,
+            height: 50,
+            animSpeedFactor: 2,
+            color: Colors.green,
+            backgroundColor: Colors.black,
+            onRefresh: () async {
+              await ref.read(forumViewModelProvider.notifier).resetState();
+            },
+            child: DefaultTabController(
+              length: 2, // Number of tabs
+              child: SafeArea(
+                child: Container(
+                  color: Theme.of(context).canvasColor,
+                  child: Column(
+                    children: [
+                      // Custom Tab Bar
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.menu),
+                              onPressed: () {
+                                // Implement your menu functionality here
+                              },
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.person),
-                            onPressed: () {
-                              // Implement your profile functionality here
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Tab Bar View
-                    Expanded(
-                      child: TabBarView(
-                        children: [
-                          Align(
-                            alignment: Alignment.topCenter,
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: GridView.builder(
-                                    controller: _scrollController,
-                                    gridDelegate:
-                                        SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: noOfPosts,
-                                      crossAxisSpacing: 5,
-                                      mainAxisSpacing: 5,
-                                      childAspectRatio: 1,
-                                    ),
-                                    itemCount: forumState.posts.length,
-                                    itemBuilder: (context, index) {
-                                      final post = forumState.posts[index];
-                                      return CustomForumCard(
-                                        postTitle: post.postTitle,
-                                        postImage:
-                                            'https://picsum.photos/200/300',
-                                        tags: post.postTags,
-                                        // profileImage: post.postPicture,
-                                        views: post.postViews,
-                                        upvotes: post.postLikes,
-                                        downvotes: post.postDislikes,
-                                        comments: post.postLikes,
-                                      );
-                                    },
-                                  ),
-                                ),
-                                if (forumState.isLoading)
-                                  const CircularProgressIndicator(
-                                      color: Colors.red),
-                              ],
-                            ),
-                          ),
-                          Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(10),
-                              child: GridView.builder(
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount:
-                                      noOfButtons, // Number of buttons per row
-                                  crossAxisSpacing: 5,
-                                  mainAxisSpacing: 5,
-                                  childAspectRatio:
-                                      0.9, // Adjust based on card size
-                                ),
-                                itemCount: 10, // Number of items in your grid
-                                itemBuilder: (context, index) {
-                                  return CustomGameCard(
-                                    gameName: 'Game Title $index',
-                                    gameImage:
-                                        'https://via.placeholder.com/800x400',
-                                  );
-                                },
+                            Expanded(
+                              child: TabBar(
+                                padding: EdgeInsets.symmetric(horizontal: 60),
+                                tabAlignment: TabAlignment.fill,
+                                labelColor: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                                indicatorSize: TabBarIndicatorSize.tab,
+                                dividerColor: Theme.of(context).canvasColor,
+                                indicatorColor: Colors.green,
+                                tabs: const [
+                                  Tab(text: 'Forum'),
+                                  Tab(text: 'Games'),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
+                            IconButton(
+                              icon: const Icon(Icons.person),
+                              onPressed: () {
+                                // Implement your profile functionality here
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      // Tab Bar View
+                      Expanded(
+                        child: TabBarView(
+                          children: [
+                            Align(
+                              alignment: Alignment.topCenter,
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child: GridView.builder(
+                                      controller: _scrollController,
+                                      gridDelegate:
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: noOfPosts,
+                                        crossAxisSpacing: 5,
+                                        mainAxisSpacing: 5,
+                                        childAspectRatio: 1,
+                                      ),
+                                      itemCount: forumState.posts.length,
+                                      itemBuilder: (context, index) {
+                                        final post = forumState.posts[index];
+                                        return CustomForumCard(
+                                          postTitle: post.postTitle,
+                                          postImage: post.postPicture,
+                                          tags: post.postTags,
+                                          // profileImage: post.postPicture,
+                                          views: post.postViews,
+                                          upvotes: post.postLikes,
+                                          downvotes: post.postDislikes,
+                                          comments: post.postLikes,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  if (forumState.isLoading)
+                                    const CircularProgressIndicator(
+                                        color: Colors.red),
+                                ],
+                              ),
+                            ),
+                            Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: GridView.builder(
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount:
+                                        noOfButtons, // Number of buttons per row
+                                    crossAxisSpacing: 5,
+                                    mainAxisSpacing: 5,
+                                    childAspectRatio:
+                                        0.9, // Adjust based on card size
+                                  ),
+                                  itemCount: 10, // Number of items in your grid
+                                  itemBuilder: (context, index) {
+                                    return CustomGameCard(
+                                      gameName: 'Game Title $index',
+                                      gameImage:
+                                          'https://via.placeholder.com/800x400',
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

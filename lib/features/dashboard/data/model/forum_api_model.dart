@@ -21,7 +21,7 @@ class ForumApiModel {
   final int postLikes;
   final int postDislikes;
   final int postViews;
-  final DateTime postedTime;
+  final String postedTime;
   @JsonKey(name: 'postedUser')
   final String postedUserId;
   final String postedFullname;
@@ -52,7 +52,7 @@ class ForumApiModel {
         postLikes = 0,
         postDislikes = 0,
         postViews = 0,
-        postedTime = DateTime.now(),
+        postedTime = '',
         postedUserId = '',
         postedFullname = '',
         postComments = [];

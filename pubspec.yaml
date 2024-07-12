@@ -53,6 +53,9 @@ dependencies:
   hive: ^2.2.3
   connectivity_plus: ^4.0.1
   liquid_pull_to_refresh: ^3.0.1
+  mockito: ^5.4.4
+  test_cov_console: ^0.2.2
+  all_sensors2: ^1.0.1
 
 
 dev_dependencies:

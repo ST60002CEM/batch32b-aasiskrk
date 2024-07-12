@@ -25,7 +25,7 @@ class ForumHiveModelAdapter extends TypeAdapter<ForumHiveModel> {
       postLikes: fields[5] as int,
       postDislikes: fields[6] as int,
       postViews: fields[7] as int,
-      postedTime: fields[8] as DateTime,
+      postedTime: fields[8] as String,
       postedUserId: fields[9] as String,
       postedFullname: fields[10] as String,
       commentedUsers: fields[11] as String?,

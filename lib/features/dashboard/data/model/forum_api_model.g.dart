@@ -17,7 +17,7 @@ ForumApiModel _$ForumApiModelFromJson(Map<String, dynamic> json) =>
       postLikes: (json['postLikes'] as num).toInt(),
       postDislikes: (json['postDislikes'] as num).toInt(),
       postViews: (json['postViews'] as num).toInt(),
-      postedTime: DateTime.parse(json['postedTime'] as String),
+      postedTime: json['postedTime'] as String,
       postedUserId: json['postedUser'] as String,
       postedFullname: json['postedFullname'] as String,
       postComments: (json['postComments'] as List<dynamic>)
@@ -35,7 +35,7 @@ Map<String, dynamic> _$ForumApiModelToJson(ForumApiModel instance) =>
       'postLikes': instance.postLikes,
       'postDislikes': instance.postDislikes,
       'postViews': instance.postViews,
-      'postedTime': instance.postedTime.toIso8601String(),
+      'postedTime': instance.postedTime,
       'postedUser': instance.postedUserId,
       'postedFullname': instance.postedFullname,
       'postComments': instance.postComments,

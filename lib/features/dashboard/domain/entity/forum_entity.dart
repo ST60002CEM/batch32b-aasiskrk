@@ -25,7 +25,7 @@ class ForumPostEntity extends Equatable {
   final int postLikes;
   final int postDislikes;
   final int postViews;
-  final DateTime postedTime;
+  final String postedTime;
   final String postedUserId;
   final String postedFullname;
   final String? commentedUsers;

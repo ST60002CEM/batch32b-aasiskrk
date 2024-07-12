@@ -37,7 +37,7 @@ class ForumHiveModel {
   final int postViews;
 
   @HiveField(8)
-  final DateTime postedTime;
+  final String postedTime;
 
   @HiveField(9)
   final String postedUserId;
@@ -75,7 +75,7 @@ class ForumHiveModel {
           postLikes: 0,
           postDislikes: 0,
           postViews: 0,
-          postedTime: DateTime.now(),
+          postedTime: '',
           postedUserId: '',
           postedFullname: '',
           commentedUsers: null,

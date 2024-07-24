@@ -45,7 +45,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   bool isShaking(List<double> values) {
     double acceleration =
         values[0] * values[0] + values[1] * values[1] + values[2] * values[2];
-    return acceleration > shakeThreshold * shakeThreshold;
+    bool shaking = acceleration > shakeThreshold * shakeThreshold;
+    if (shaking) {
+      print(
+          'Accelerometer values: x=${values[0]}, y=${values[1]}, z=${values[2]}');
+    }
+    return shaking;
   }
 
   void _showReportBottomSheet() {

@@ -9,15 +9,18 @@ import '../entity/auth_entity.dart';
 
 final authRepositoryProvider = Provider<IAuthRepository>((ref) {
   final checkConnectivity = ref.read(connectivityStatusProvider);
-  if (checkConnectivity == ConnectivityStatus.isConnected) {
-    return ref.read(authRemoteRepositoryProvider);
-  } else {
-    return ref.read(authLocalRepositoryProvider);
-  }
+  // if (checkConnectivity == ConnectivityStatus.isConnected) {
+  //   return ref.read(authRemoteRepositoryProvider);
+  // } else {
+  //   return ref.read(authLocalRepositoryProvider);
+  // }
+  return ref.read(authRemoteRepositoryProvider);
 });
 
 abstract class IAuthRepository {
   Future<Either<Failure, bool>> registerUser(AuthEntity user);
   Future<Either<Failure, bool>> loginUser(String email, String password);
   Future<Either<Failure, String>> uploadProfilePicture(File file);
+  Future<Either<Failure, AuthEntity>> getCurrentUser();
+  Future<Either<Failure, bool>> logout();
 }

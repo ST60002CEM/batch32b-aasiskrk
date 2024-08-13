@@ -4,7 +4,7 @@ class CustomForumCard extends StatelessWidget {
   final String postTitle;
   final String postImage;
   final List<String> tags;
-  // final String profileImage;
+  final String postedFullname;
   final int views;
   final int upvotes;
   final int downvotes;
@@ -13,13 +13,14 @@ class CustomForumCard extends StatelessWidget {
   CustomForumCard({
     required this.postTitle,
     required this.postImage,
+    required this.postedFullname,
     required this.tags,
-    // required this.profileImage,
     required this.views,
     required this.upvotes,
     required this.downvotes,
     required this.comments,
   });
+  final String baseUrlPhoto = "http://192.168.18.107:5000/forum/";
 
   @override
   Widget build(BuildContext context) {
@@ -38,10 +39,20 @@ class CustomForumCard extends StatelessWidget {
             borderRadius: BorderRadius.vertical(
                 top: Radius.circular(15)), // Rounded corners for the image
             child: Image.network(
-              postImage,
+              '$baseUrlPhoto${postImage ?? ''}',
               width: double.infinity, // Make image span full width
-              height: 200, // Set a fixed height for the image
+              height: 182, // Set a fixed height for the image
               fit: BoxFit.cover,
+              errorBuilder: (BuildContext context, Object exception,
+                  StackTrace? stackTrace) {
+                return Container(
+                  width: double.infinity,
+                  height: 200,
+                  color: Colors.grey,
+                  child:
+                      Icon(Icons.broken_image, size: 50, color: Colors.white),
+                );
+              },
             ),
           ),
           Padding(
@@ -57,6 +68,10 @@ class CustomForumCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 10),
+                Text(postedFullname),
+                SizedBox(
+                  height: 5,
+                ),
                 Wrap(
                   spacing: 5.0,
                   children: tags.map((tag) => Chip(label: Text(tag))).toList(),
@@ -64,9 +79,6 @@ class CustomForumCard extends StatelessWidget {
                 SizedBox(height: 10),
                 Row(
                   children: [
-                    // CircleAvatar(
-                    //   backgroundImage: NetworkImage(profileImage),
-                    // ),
                     SizedBox(width: 10),
                     Text(
                       'Views: $views',

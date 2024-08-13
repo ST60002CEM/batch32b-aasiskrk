@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:playforge/features/dashboard/presentation/view/home_view.dart';
-import 'package:playforge/features/dashboard/presentation/view/notification_screen.dart';
-import 'package:playforge/features/dashboard/presentation/view/search_screen.dart';
-import 'package:playforge/features/dashboard/presentation/view/users_feed_screen.dart';
+import 'package:playforge/features/profile/presentation/view/profile_screen.dart';
+import 'package:playforge/features/search/presentation/view/search_screen.dart';
+import 'package:playforge/features/user_feed/presentation/view/users_feed_screen.dart';
 import 'package:all_sensors2/all_sensors2.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -16,10 +16,10 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   int _selectedIndex = 0;
   List<Widget> lstBottomScreen = [
-    HomeView(),
-    SearchScreen(),
-    UsersFeedScreen(),
-    NotificationScreen(),
+    const HomeView(),
+    const SearchScreen(),
+    const UsersFeedScreen(),
+    const ProfileScreen(),
     // Add your other screens here
   ];
 
@@ -46,10 +46,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     double acceleration =
         values[0] * values[0] + values[1] * values[1] + values[2] * values[2];
     bool shaking = acceleration > shakeThreshold * shakeThreshold;
-    if (shaking) {
-      print(
-          'Accelerometer values: x=${values[0]}, y=${values[1]}, z=${values[2]}');
-    }
+
     return shaking;
   }
 
@@ -59,7 +56,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       context: context,
       elevation: 5,
       backgroundColor: BottomAppBarTheme.of(context).color,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) {
         return Padding(
@@ -68,59 +65,59 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Center(
+              const Center(
                 child: Text('Shake to Report',
                     style:
                         TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
               ),
-              SizedBox(height: 16),
-              Center(
+              const SizedBox(height: 16),
+              const Center(
                   child: Text(
                       'Do you want to report a bug or leave a suggestion?')),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
                   // Handle report bug action
                   Navigator.pop(context);
                 },
-                child: Text(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(8), // Less rounded corners
+                  ),
+                  backgroundColor: const Color.fromRGBO(
+                      48, 255, 81, 1), // Green accent color
+                ),
+                child: const Text(
                   'Report Bug',
                   style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 17),
                 ),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(8), // Less rounded corners
-                  ),
-                  backgroundColor: const Color.fromRGBO(
-                      48, 255, 81, 1), // Green accent color
-                ),
               ),
-              SizedBox(height: 10), // Add some space between buttons
+              const SizedBox(height: 10), // Add some space between buttons
               ElevatedButton(
                 onPressed: () {
                   // Handle suggest something action
                   Navigator.pop(context);
                 },
-                child: Text(
-                  'Suggest Something',
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 17),
-                ),
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 15),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius:
                         BorderRadius.circular(8), // Less rounded corners
                   ),
                   backgroundColor: const Color.fromRGBO(
                       48, 255, 81, 1), // Green accent color
+                ),
+                child: const Text(
+                  'Suggest Something',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17),
                 ),
               ),
             ],
@@ -174,8 +171,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         label = 'Your Posts';
         break;
       case 3:
-        icon = Icons.notifications;
-        label = 'Notification';
+        icon = Icons.person;
+        label = 'Profile';
         break;
       default:
         icon = Icons.home;
@@ -196,7 +193,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       decoration: isSelected
           ? BoxDecoration(
               color: const Color.fromRGBO(48, 255, 81, 1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(14),
             )
           : null,
       child: Icon(icon,

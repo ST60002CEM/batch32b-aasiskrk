@@ -137,6 +137,32 @@ class MockAuthUseCase extends _i1.Mock implements _i3.AuthUseCase {
           ),
         )),
       ) as _i4.Future<_i2.Either<_i5.Failure, bool>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, _i7.AuthEntity>> getCurrentUser() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getCurrentUser,
+          [],
+        ),
+        returnValue: _i4.Future<_i2.Either<_i5.Failure, _i7.AuthEntity>>.value(
+            _FakeEither_0<_i5.Failure, _i7.AuthEntity>(
+          this,
+          Invocation.method(
+            #getCurrentUser,
+            [],
+          ),
+        )),
+        returnValueForMissingStub:
+            _i4.Future<_i2.Either<_i5.Failure, _i7.AuthEntity>>.value(
+                _FakeEither_0<_i5.Failure, _i7.AuthEntity>(
+          this,
+          Invocation.method(
+            #getCurrentUser,
+            [],
+          ),
+        )),
+      ) as _i4.Future<_i2.Either<_i5.Failure, _i7.AuthEntity>>);
 }
 
 /// A class which mocks [LoginViewNavigator].

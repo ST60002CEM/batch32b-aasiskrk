@@ -1,15 +1,14 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../../../dashboard/data/model/forum_api_model.dart';
+part of 'posts.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-ForumApiModel _$ForumApiModelFromJson(Map<String, dynamic> json) =>
-    ForumApiModel(
+Posts _$PostsFromJson(Map<String, dynamic> json) => Posts(
       id: json['_id'] as String,
-      postPicture: json['postPicture'] as String,
+      postPicture: Posts._fromJson(json['postPicture'] as String?),
       postTitle: json['postTitle'] as String,
       postDescription: json['postDescription'] as String,
       postTags:
@@ -18,17 +17,16 @@ ForumApiModel _$ForumApiModelFromJson(Map<String, dynamic> json) =>
       postDislikes: (json['postDislikes'] as num).toInt(),
       postViews: (json['postViews'] as num).toInt(),
       postedTime: json['postedTime'] as String,
-      postedUserId: json['postedUser'],
+      postedUserId: json['postedUser'] as String,
       postedFullname: json['postedFullname'] as String,
       postComments: (json['postComments'] as List<dynamic>)
-          .map((e) => CommentApiModel.fromJson(e as Map<String, dynamic>))
+          .map((e) => CommentModel.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
-Map<String, dynamic> _$ForumApiModelToJson(ForumApiModel instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$PostsToJson(Posts instance) => <String, dynamic>{
       '_id': instance.id,
-      'postPicture': instance.postPicture,
+      'postPicture': Posts._toJson(instance.postPicture),
       'postTitle': instance.postTitle,
       'postDescription': instance.postDescription,
       'postTags': instance.postTags,
@@ -41,32 +39,17 @@ Map<String, dynamic> _$ForumApiModelToJson(ForumApiModel instance) =>
       'postComments': instance.postComments,
     };
 
-CommentApiModel _$CommentApiModelFromJson(Map<String, dynamic> json) =>
-    CommentApiModel(
+CommentModel _$CommentModelFromJson(Map<String, dynamic> json) => CommentModel(
       userId: json['_id'] as String,
       comment: json['comment'] as String,
       commentedAt: DateTime.parse(json['commentedAt'] as String),
       userName: json['userName'] as String,
     );
 
-Map<String, dynamic> _$CommentApiModelToJson(CommentApiModel instance) =>
+Map<String, dynamic> _$CommentModelToJson(CommentModel instance) =>
     <String, dynamic>{
       '_id': instance.userId,
       'comment': instance.comment,
       'commentedAt': instance.commentedAt.toIso8601String(),
       'userName': instance.userName,
-    };
-
-UserPostedApiModel _$UserPostedApiModelFromJson(Map<String, dynamic> json) =>
-    UserPostedApiModel(
-      userId: json['_id'] as String,
-      fullName: json['fullName'] as String,
-      profilePicture: json['profilePicture'] as String?,
-    );
-
-Map<String, dynamic> _$UserPostedApiModelToJson(UserPostedApiModel instance) =>
-    <String, dynamic>{
-      '_id': instance.userId,
-      'fullName': instance.fullName,
-      'profilePicture': instance.profilePicture,
     };

@@ -3,9 +3,10 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/failure/failure.dart';
+import '../../../../core/failure/post_failure.dart';
 import '../../domain/entity/forum_entity.dart';
 import '../../domain/repository/forum_repository.dart';
-import '../data_source/remote/forum_remote_data_source.dart';
+import '../../../dashboard/data/data_source/remote/forum_remote_data_source.dart';
 
 final forumRemoteRepositoryProvider = Provider<IForumRepository>((ref) {
   return ForumRemoteRepository(
@@ -29,12 +30,19 @@ class ForumRemoteRepository implements IForumRepository {
   }
 
   @override
-  Future<Either<Failure, bool>> addForumPost(ForumPostEntity post) {
+  Future<Either<Failure, bool>> addForumPost(
+      ForumPostEntity post, File? image) {
     return _forumRemoteDataSource.createPost(post);
   }
 
   @override
-  Future<Either<Failure, ForumPostEntity?>> getForumPost(String postId) {
+  Future<Either<Failure, List<ForumPostEntity>>> getForumPost(String postId) {
     return _forumRemoteDataSource.getSingleForumPost(postId);
+  }
+
+  @override
+  Future<Either<PostFailure, List<ForumPostEntity>>> searchAllPost(
+      String searchTerm) {
+    return _forumRemoteDataSource.searchALLPost(searchTerm);
   }
 }

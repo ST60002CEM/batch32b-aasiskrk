@@ -230,6 +230,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                     password: passwordFieldController.text,
                     address: addressFieldController.text,
                     phone: phoneFieldController.text,
+                    isAdmin: false,
                   );
                   ref.read(authViewModelProvider.notifier).registerUser(user);
                 }

@@ -28,4 +28,8 @@ class AuthUseCase {
       String? email, String? password) async {
     return await _authRepository.loginUser(email ?? '', password ?? '');
   }
+
+  Future<Either<Failure, AuthEntity>> getCurrentUser() async {
+    return await _authRepository.getCurrentUser();
+  }
 }

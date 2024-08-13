@@ -1,10 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:playforge/core/common/custom_forum_card.dart';
+import 'package:playforge/features/forum/presentation/view/forum_view.dart';
+import 'package:playforge/features/dashboard/presentation/viewmodel/forum_view_model.dart';
 import '../../../../core/common/custom_game_card.dart';
-import '../viewmodel/forum_view_model.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
+import '../../../../app/constants/api_endpoint.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -17,6 +17,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
   final ScrollController _scrollController = ScrollController();
   int noOfButtons = 0;
   int noOfPosts = 0;
+  bool isLoading = false;
+  int currentPage = 1;
 
   @override
   void dispose() {
@@ -29,7 +31,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
     var forumState = ref.watch(forumViewModelProvider);
     if (MediaQuery.of(context).orientation == Orientation.landscape) {
       noOfButtons = 4;
-      noOfPosts = 2;
+      noOfPosts = 5;
     } else {
       noOfButtons = 2;
       noOfPosts = 1;
@@ -39,76 +41,77 @@ class _HomeViewState extends ConsumerState<HomeView> {
       onNotification: (notification) {
         if (notification is ScrollEndNotification) {
           // Scroll garda feri last ma ho ki haina bhanera check garne ani data call garne
-          if (_scrollController.position.extentAfter == 0) {
-            ref.read(forumViewModelProvider.notifier).getAllForumPosts();
+          if (_scrollController.position.extentAfter == 0 &&
+              !forumState.hasReachedMax) {
+            ref.read(forumViewModelProvider.notifier).getAllPosts();
           }
         }
         return true;
       },
-      child: Scaffold(
-        body: SafeArea(
-          child: LiquidPullToRefresh(
-            showChildOpacityTransition: false,
-            height: 50,
-            animSpeedFactor: 2,
-            color: Colors.green,
-            backgroundColor: Colors.black,
-            onRefresh: () async {
-              await ref.read(forumViewModelProvider.notifier).resetState();
-            },
-            child: DefaultTabController(
-              length: 2, // Number of tabs
-              child: SafeArea(
-                child: Container(
-                  color: Theme.of(context).canvasColor,
-                  child: Column(
-                    children: [
-                      // Custom Tab Bar
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.menu),
-                              onPressed: () {
-                                // Implement your menu functionality here
-                              },
+      child: SafeArea(
+        child: Scaffold(
+          body: DefaultTabController(
+            length: 2, // Number of tabs
+            child: SafeArea(
+              child: Container(
+                color: Theme.of(context).canvasColor,
+                child: Column(
+                  children: [
+                    // Logo at the top
+
+                    // Custom Tab Bar
+                    Container(
+                      color: BottomAppBarTheme.of(context).color,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Image.asset('assets/images/Inside.png',
+                                height: 30,
+                                width: 30 // Adjust the height as needed
+                                ),
+                          ),
+                          Expanded(
+                            flex: 6,
+                            child: TabBar(
+                              tabAlignment: TabAlignment.fill,
+                              enableFeedback: true,
+                              labelColor: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black,
+                              indicatorSize: TabBarIndicatorSize.tab,
+                              dividerColor: BottomAppBarTheme.of(context).color,
+                              indicatorColor: Colors.green,
+                              tabs: const [
+                                Tab(text: 'Forum'),
+                                Tab(text: 'Games'),
+                              ],
                             ),
-                            Expanded(
-                              child: TabBar(
-                                padding: EdgeInsets.symmetric(horizontal: 60),
-                                tabAlignment: TabAlignment.fill,
-                                labelColor: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                                indicatorSize: TabBarIndicatorSize.tab,
-                                dividerColor: Theme.of(context).canvasColor,
-                                indicatorColor: Colors.green,
-                                tabs: const [
-                                  Tab(text: 'Forum'),
-                                  Tab(text: 'Games'),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.person),
-                              onPressed: () {
-                                // Implement your profile functionality here
-                              },
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      // Tab Bar View
-                      Expanded(
-                        child: TabBarView(
-                          children: [
-                            Align(
-                              alignment: Alignment.topCenter,
-                              child: Column(
-                                children: [
-                                  Expanded(
+                    ),
+                    // Tab Bar View
+                    Expanded(
+                      child: TabBarView(
+                        children: [
+                          Align(
+                            alignment: Alignment.topCenter,
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: LiquidPullToRefresh(
+                                    showChildOpacityTransition: false,
+                                    height: 50,
+                                    animSpeedFactor: 2,
+                                    color: Theme.of(context).canvasColor,
+                                    backgroundColor: Colors.green,
+                                    onRefresh: () async {
+                                      await ref
+                                          .read(forumViewModelProvider.notifier)
+                                          .resetState();
+                                    },
                                     child: GridView.builder(
                                       controller: _scrollController,
                                       gridDelegate:
@@ -121,28 +124,91 @@ class _HomeViewState extends ConsumerState<HomeView> {
                                       itemCount: forumState.posts.length,
                                       itemBuilder: (context, index) {
                                         final post = forumState.posts[index];
-                                        return CustomForumCard(
-                                          postTitle: post.postTitle,
-                                          postImage: post.postPicture,
-                                          tags: post.postTags,
-                                          // profileImage: post.postPicture,
-                                          views: post.postViews,
-                                          upvotes: post.postLikes,
-                                          downvotes: post.postDislikes,
-                                          comments: post.postLikes,
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Image.network(
+                                              '${ApiEndpoints.imageBaseUrl}${(post.postPicture).toString() ?? 'https://via.placeholder.com/800x400'}',
+                                              width: double.infinity,
+                                              height: 182,
+                                              fit: BoxFit.cover,
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.all(10),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    post.postTitle,
+                                                    style: const TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 10),
+                                                  Text(post.postedFullname),
+                                                  const SizedBox(height: 5),
+                                                  Wrap(
+                                                    spacing: 5.0,
+                                                    children: post.postTags
+                                                        .map((tag) => Chip(
+                                                            label: Text(tag)))
+                                                        .toList(),
+                                                  ),
+                                                  const SizedBox(height: 10),
+                                                  Row(
+                                                    children: [
+                                                      const SizedBox(width: 10),
+                                                      Text(
+                                                        'Views: ${post.postViews}',
+                                                        style: const TextStyle(
+                                                            fontSize: 16),
+                                                      ),
+                                                      const Spacer(),
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                            Icons.thumb_up),
+                                                        onPressed: () {},
+                                                      ),
+                                                      Text('${post.postLikes}'),
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                            Icons.thumb_down),
+                                                        onPressed: () {},
+                                                      ),
+                                                      Text(
+                                                          '${post.postDislikes}'),
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                            Icons.comment),
+                                                        onPressed: () {},
+                                                      ),
+                                                      Text(
+                                                          '${post.postComments.length}'),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                         );
                                       },
                                     ),
                                   ),
-                                  if (forumState.isLoading)
-                                    const CircularProgressIndicator(
-                                        color: Colors.red),
-                                ],
-                              ),
+                                ),
+                                if (forumState.isLoading)
+                                  const CircularProgressIndicator(
+                                      color: Colors.red),
+                              ],
                             ),
-                            Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
+                          ),
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Expanded(
                                 child: GridView.builder(
                                   gridDelegate:
                                       SliverGridDelegateWithFixedCrossAxisCount(
@@ -164,82 +230,36 @@ class _HomeViewState extends ConsumerState<HomeView> {
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          elevation: 10,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          foregroundColor: Colors.white,
-          backgroundColor: Colors.green,
-          splashColor: Colors.white60,
-          onPressed: () {
-            // Implement your FAB functionality here
-          },
-          child: Icon(
-            Icons.add,
+          floatingActionButton: FloatingActionButton(
+            elevation: 10,
+            // mini: true,
+            tooltip: "Add Post",
+            enableFeedback: true,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            foregroundColor: BottomAppBarTheme.of(context).color,
+            backgroundColor: const Color.fromRGBO(48, 255, 81, 1),
+            splashColor: Colors.white60,
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const ForumView()));
+            },
+            child: const Icon(
+              Icons.add,
+            ),
           ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );
   }
 }
-//ConstrainedBox(
-//                                   constraints: BoxConstraints(maxHeight: 390),
-//                                   child: CustomForumCard(
-//                                     postTitle:
-//                                         "Mobile Legends yet another Update!",
-//                                     postImage:
-//                                         "https://enazoapps.com/wp-content/uploads/2024/01/MOBILE-LEGENDS-BANG-BANG-MOD-APK-2.webp",
-//                                     tags: const ["Action", "Multiplayer"],
-//                                     profileImage:
-//                                         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAHzOeCh-5vdpkA3FKLvVcIajDKBtIV3EXAHNBpTXxXw&s",
-//                                     views: 2131,
-//                                     upvotes: 200,
-//                                     downvotes: 35,
-//                                     comments: 10,
-//                                   ),
-//                                 ),
-//                                 ConstrainedBox(
-//                                   constraints: BoxConstraints(maxHeight: 390),
-//                                   child: CustomForumCard(
-//                                     postTitle: "Top 15 Best Online RPG",
-//                                     postImage:
-//                                         "https://english.makalukhabar.com/wp-content/uploads/2023/06/PUBG-MK.jpg",
-//                                     tags: const [
-//                                       "Battle Royale",
-//                                       "Multiplayer",
-//                                     ],
-//                                     profileImage:
-//                                         "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
-//                                     views: 1230,
-//                                     upvotes: 20,
-//                                     downvotes: 5,
-//                                     comments: 1,
-//                                   ),
-//                                 ),
-//                                 ConstrainedBox(
-//                                   constraints: BoxConstraints(maxHeight: 390),
-//                                   child: CustomForumCard(
-//                                     postTitle:
-//                                         "Blue Lock Blaze Battle Gameplay",
-//                                     postImage:
-//                                         "https://o.qoo-img.com/storage.qoo-img.com/game/22523/023E33SVvRLaUhw9bf2v1zYGvikHi0q6.jpg?w=800",
-//                                     tags: const ["Multiplayer"],
-//                                     profileImage:
-//                                         "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg",
-//                                     views: 2310,
-//                                     upvotes: 210,
-//                                     downvotes: 15,
-//                                     comments: 30,
-//                                   ),
-//                                 ),

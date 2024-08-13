@@ -1,3 +1,5 @@
+import 'package:playforge/features/auth/domain/entity/auth_entity.dart';
+
 class AuthState {
   final bool isLoading;
   final String? error;
@@ -18,6 +20,7 @@ class AuthState {
   }
 
   AuthState copyWith({
+    AuthEntity? authEntity,
     bool? isLoading,
     String? error,
     String? imageName,

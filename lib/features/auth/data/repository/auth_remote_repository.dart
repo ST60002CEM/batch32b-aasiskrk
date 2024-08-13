@@ -32,4 +32,14 @@ class AuthRemoteRepository implements IAuthRepository {
   Future<Either<Failure, String>> uploadProfilePicture(File file) {
     return _authRemoteDataSource.uploadProfilePicture(file);
   }
+
+  @override
+  Future<Either<Failure, AuthEntity>> getCurrentUser() {
+    return _authRemoteDataSource.getCurrentUser();
+  }
+
+  @override
+  Future<Either<Failure, bool>> logout() async {
+    return await _authRemoteDataSource.logout();
+  }
 }

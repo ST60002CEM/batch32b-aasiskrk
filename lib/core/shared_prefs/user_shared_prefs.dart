@@ -10,6 +10,7 @@ final userSharedPrefsProvider = Provider<UserSharedPrefs>((ref) {
 
 class UserSharedPrefs {
   late SharedPreferences _sharedPreferences;
+
   // Set user token
   Future<Either<Failure, bool>> setUserToken(String token) async {
     try {
@@ -38,6 +39,60 @@ class UserSharedPrefs {
       _sharedPreferences = await SharedPreferences.getInstance();
       await _sharedPreferences.remove('token');
       return right(true);
+    } catch (e) {
+      return left(Failure(error: e.toString()));
+    }
+  }
+
+  // Set user ID
+  Future<Either<Failure, bool>> setUserId(String userId) async {
+    try {
+      _sharedPreferences = await SharedPreferences.getInstance();
+      await _sharedPreferences.setString('userId', userId);
+      return right(true);
+    } catch (e) {
+      return left(Failure(error: e.toString()));
+    }
+  }
+
+  // Get user ID
+  Future<Either<Failure, String?>> getUserId() async {
+    try {
+      _sharedPreferences = await SharedPreferences.getInstance();
+      final userId = _sharedPreferences.getString('userId');
+      return right(userId);
+    } catch (e) {
+      return left(Failure(error: e.toString()));
+    }
+  }
+
+  // Delete user ID
+  Future<Either<Failure, bool>> deleteUserId() async {
+    try {
+      _sharedPreferences = await SharedPreferences.getInstance();
+      await _sharedPreferences.remove('userId');
+      return right(true);
+    } catch (e) {
+      return left(Failure(error: e.toString()));
+    }
+  }
+
+  // Set user info
+  Future<Either<Failure, bool>> setUserName(String name) async {
+    try {
+      _sharedPreferences = await SharedPreferences.getInstance();
+      await _sharedPreferences.setString('fullName', name);
+      return right(true);
+    } catch (e) {
+      return left(Failure(error: e.toString()));
+    }
+  }
+
+  Future<Either<Failure, String?>> getFullName() async {
+    try {
+      _sharedPreferences = await SharedPreferences.getInstance();
+      final name = _sharedPreferences.getString('fullName');
+      return right(name);
     } catch (e) {
       return left(Failure(error: e.toString()));
     }

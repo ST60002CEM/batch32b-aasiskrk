@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../../domain/entity/forum_entity.dart';
 
-part 'forum_api_model.g.dart';
+part '../../../dashboard/data/model/forum_api_model.g.dart';
 
 final forumApiModelProvider = Provider<ForumApiModel>(
   (ref) => ForumApiModel.empty(),
@@ -12,7 +14,7 @@ final forumApiModelProvider = Provider<ForumApiModel>(
 @JsonSerializable()
 class ForumApiModel {
   @JsonKey(name: '_id')
-  final String? id;
+  final String id;
 
   final String postPicture;
   final String postTitle;
@@ -23,12 +25,12 @@ class ForumApiModel {
   final int postViews;
   final String postedTime;
   @JsonKey(name: 'postedUser')
-  final String postedUserId;
+  final dynamic postedUserId;
   final String postedFullname;
   final List<CommentApiModel> postComments;
 
   ForumApiModel({
-    this.id,
+    required this.id,
     required this.postPicture,
     required this.postTitle,
     required this.postDescription,
@@ -93,7 +95,9 @@ class ForumApiModel {
       postDislikes: postDislikes,
       postViews: postViews,
       postedTime: postedTime,
-      postedUserId: postedUserId,
+      postedUserId: postedUserId is UserPostedApiModel
+          ? postedUserId.toEntity()
+          : postedUserId.toString(),
       postedFullname: postedFullname,
       postComments: postComments.map((comment) => comment.toEntity()).toList(),
     );
@@ -109,24 +113,32 @@ class ForumApiModel {
         postDislikes: entity.postDislikes,
         postViews: entity.postViews,
         postedTime: entity.postedTime,
-        postedUserId: entity.postedUserId,
+        postedUserId: entity.postedUserId is PostedUserEntity
+            ? UserPostedApiModel.fromEntity(entity.postedUserId)
+            : entity.postedUserId,
         postedFullname: entity.postedFullname,
         postComments: entity.postComments
             .map((comment) => CommentApiModel.fromEntity(comment))
             .toList(),
       );
+  static File? _fromJson(String? path) => path == null ? null : File(path);
+
+  static String? _toJson(File? file) => file?.path;
 }
 
 @JsonSerializable()
 class CommentApiModel {
+  @JsonKey(name: '_id')
   final String userId;
   final String comment;
   final DateTime commentedAt;
+  final String userName;
 
   CommentApiModel({
     required this.userId,
     required this.comment,
     required this.commentedAt,
+    required this.userName,
   });
 
   factory CommentApiModel.fromJson(Map<String, dynamic> json) =>
@@ -139,6 +151,7 @@ class CommentApiModel {
       userId: userId,
       comment: comment,
       commentedAt: commentedAt,
+      userName: userName,
     );
   }
 
@@ -146,5 +159,45 @@ class CommentApiModel {
         userId: entity.userId,
         comment: entity.comment,
         commentedAt: entity.commentedAt,
+        userName: entity.userName,
+      );
+}
+
+@JsonSerializable()
+class UserPostedApiModel {
+  @JsonKey(name: '_id')
+  final String userId;
+  final String fullName;
+  final String? profilePicture;
+
+  UserPostedApiModel({
+    required this.userId,
+    required this.fullName,
+    this.profilePicture,
+  });
+
+  UserPostedApiModel.empty()
+      : userId = '',
+        fullName = '',
+        profilePicture = '';
+
+  factory UserPostedApiModel.fromJson(Map<String, dynamic> json) =>
+      _$UserPostedApiModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserPostedApiModelToJson(this);
+
+  PostedUserEntity toEntity() {
+    return PostedUserEntity(
+      userId: userId ?? '',
+      fullName: fullName ?? '',
+      profilePicture: profilePicture ?? "",
+    );
+  }
+
+  static UserPostedApiModel fromEntity(PostedUserEntity entity) =>
+      UserPostedApiModel(
+        userId: entity.userId,
+        fullName: entity.fullName,
+        profilePicture: entity.profilePicture,
       );
 }

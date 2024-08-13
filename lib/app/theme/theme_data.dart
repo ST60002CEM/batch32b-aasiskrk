@@ -48,7 +48,7 @@ ThemeData getApplicationTheme() {
     primaryColor: Colors.white,
     canvasColor: const Color.fromRGBO(226, 226, 226, 1),
     cardColor: const Color.fromRGBO(0, 0, 0, 1),
-    useMaterial3: true,
+    useMaterial3: false,
   );
 }
 
@@ -60,6 +60,6 @@ ThemeData getDarkTheme() {
     brightness: Brightness.dark,
     primaryColor: const Color.fromRGBO(23, 23, 23, 1),
     cardColor: const Color.fromRGBO(0, 0, 0, 1),
-    useMaterial3: true,
+    useMaterial3: false,
   );
 }

@@ -3,8 +3,10 @@ class ApiEndpoints {
 
   static const Duration connectionTimeout = Duration(seconds: 1000);
   static const Duration receiveTimeout = Duration(seconds: 1000);
+
   static const String baseUrl = "http://192.168.1.66:5000/api/";
-  //static const String baseUrl = "http://localhost:3000/api/v1/";
+  static const String imageBaseUrl = "http://192.168.1.66:5000/forum/";
+  static const String profileImageUrl = "http://192.168.1.66:5000/profile/";
   //static const String baseUrl = "http://192.168.4.4:3000/api/v1/";
 
   static const limitPage = 5;
@@ -17,13 +19,16 @@ class ApiEndpoints {
   // static const String deleteUser = "auth/deleteUser/";
   // static const String imageUrl = "http://10.0.2.2:5000/uploads/";
   static const String uploadImage = "auth/uploadImage";
-  // static const String currentUser = "auth/getMe";
+  static const String currentUser = "user/get_user/";
 
   // ====================== Forum Routes ======================
+  static const String search = "forum/search";
   static const String createPost = "forum/create";
   static const String getAllForumPosts = "forum/get_all_post";
   static const String getPagination = "forum/pagination";
   static const String getSingleForumPost = "forum/get_single_post/";
+  static const String getUserPost = "forum/user_posts/";
+
   static const String editPost = "forum/edit_post/";
   static const String deletePost = "forum/delete_post/";
   static const String addComment = "forum/add_comment/";

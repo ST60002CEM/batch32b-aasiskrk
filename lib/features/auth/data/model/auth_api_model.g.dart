@@ -13,6 +13,7 @@ AuthApiModel _$AuthApiModelFromJson(Map<String, dynamic> json) => AuthApiModel(
       address: json['address'] as String,
       password: json['password'] as String?,
       phone: json['phone'] as String,
+      isAdmin: json['isAdmin'] as bool,
     );
 
 Map<String, dynamic> _$AuthApiModelToJson(AuthApiModel instance) =>
@@ -23,4 +24,5 @@ Map<String, dynamic> _$AuthApiModelToJson(AuthApiModel instance) =>
       'address': instance.address,
       'password': instance.password,
       'phone': instance.phone,
+      'isAdmin': instance.isAdmin,
     };

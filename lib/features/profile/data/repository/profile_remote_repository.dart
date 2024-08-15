@@ -20,6 +20,11 @@ class ProfileRemoteRepository implements IProfileRepository {
     return _profileRemoteDataSource.getUser();
   }
 
+  @override
+  Future<Either<Failure, bool>> updateProfile(File image) {
+    return _profileRemoteDataSource.updateProfile(image);
+  }
+
   // @override
   // Future<Either<Failure, bool>> updateProfile(File image) {
   //   return _profileRemoteDataSource.updateProfile(image);

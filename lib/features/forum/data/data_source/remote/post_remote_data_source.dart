@@ -10,6 +10,7 @@ import '../../../../../core/failure/post_failure.dart';
 import '../../../../../core/networking/remote/http_service.dart';
 import '../../../../../core/shared_prefs/user_shared_prefs.dart';
 import '../../../domain/entity/post_entity.dart';
+import '../../model/posts.dart';
 
 final postRemoteDataSourceProvider = Provider<PostsRemoteDataSource>(
   (ref) => PostsRemoteDataSource(

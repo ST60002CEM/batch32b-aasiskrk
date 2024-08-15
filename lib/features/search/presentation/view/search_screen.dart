@@ -44,39 +44,64 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ),
             centerTitle: true,
             elevation: 0,
-            backgroundColor: BottomAppBarTheme.of(context).color,
+            backgroundColor: Theme.of(context).canvasColor,
           ),
         ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Enter search term...',
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: _onSearch,
+        body: Container(
+          color: Theme.of(context).primaryColorDark,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey[900],
+                    hintText: 'Enter search term...',
+                    hintStyle: TextStyle(color: Colors.grey[500]),
+                    prefixIcon: const Icon(Icons.search, color: Colors.white),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[700]!),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.green),
+                    ),
                   ),
+                  style: const TextStyle(color: Colors.white),
+                  onChanged: (_) => _onSearch(),
                 ),
-                onSubmitted: (_) => _onSearch(),
               ),
-            ),
-            Expanded(
-              child: state.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : state.searchResults.isEmpty
-                      ? const Center(child: Text('No posts found'))
-                      : ListView.builder(
-                          itemCount: state.searchResults.length,
-                          itemBuilder: (context, index) {
-                            final search = state.searchResults[index];
-                            return _buildPostItem(search);
-                          },
-                        ),
-            ),
-          ],
+              Expanded(
+                child: state.isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                        color: Colors.green,
+                      ))
+                    : state.searchResults.isEmpty
+                        ? const Center(
+                            child: Text('No posts found',
+                                style: TextStyle(color: Colors.white)))
+                        : ListView.separated(
+                            itemCount: state.searchResults.length,
+                            separatorBuilder: (context, index) => const Divider(
+                              height: 1,
+                              color: Colors.grey,
+                            ),
+                            itemBuilder: (context, index) {
+                              final search = state.searchResults[index];
+                              return _buildPostItem(search);
+                            },
+                          ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -84,15 +109,24 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   Widget _buildPostItem(ForumPostEntity search) {
     return Card(
+      color: Theme.of(context).canvasColor,
       child: ListTile(
         leading: search.postPicture != null
             ? Image.network(
-                '${ApiEndpoints.imageBaseUrl}${(search.postPicture).toString() ?? ''}')
-            : const Icon(Icons.image),
-        title: Text(search.postTitle),
-        subtitle: Text(search.postDescription),
+                '${ApiEndpoints.imageBaseUrl}${(search.postPicture).toString() ?? ''}',
+                width: 60,
+                height: 60,
+              )
+            : const Icon(Icons.image, color: Colors.white),
+        title:
+            Text(search.postTitle, style: const TextStyle(color: Colors.white)),
+        subtitle: Text(search.postDescription,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.white70)),
         onTap: () {
-          // Navigate to post details screen
+          // Navigate to another page with post details
+          ref.read(forumViewModelProvider.notifier).openPostPage(search.id);
         },
       ),
     );

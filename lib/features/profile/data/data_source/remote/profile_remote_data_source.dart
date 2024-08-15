@@ -128,48 +128,48 @@ class ProfileRemoteDataSource {
   //     );
   //   }
   // }
-  //
-  // Future<Either<Failure, bool>> updateProfile(File image) async {
-  //   try {
-  //     String? id;
-  //     var data = await userSharedPrefs.getUserId();
-  //     data.fold(
-  //           (l) => id = null,
-  //           (r) => id = r!,
-  //     );
-  //
-  //     if (id == null) {
-  //       return Left(Failure(error: "User id is null", statusCode: "0"));
-  //     }
-  //
-  //     FormData formData = FormData.fromMap({
-  //       'profileImage': await MultipartFile.fromFile(image.path,
-  //           filename: image.path.split('/').last),
-  //     });
-  //
-  //     var response = await dio.put(
-  //       '${ApiEndpoints.updateProfile}$id',
-  //       data: formData,
-  //     );
-  //
-  //     print(response);
-  //     if (response.statusCode == 200) {
-  //       return const Right(true);
-  //     } else {
-  //       return Left(
-  //         Failure(
-  //           error: response.data["message"],
-  //           statusCode: response.statusCode.toString(),
-  //         ),
-  //       );
-  //     }
-  //   } on DioException catch (e) {
-  //     return Left(
-  //       Failure(
-  //         error: e.error.toString(),
-  //         statusCode: e.response?.statusCode.toString() ?? '0',
-  //       ),
-  //     );
-  //   }
-  // }
+
+  Future<Either<Failure, bool>> updateProfile(File image) async {
+    try {
+      String? id;
+      var data = await userSharedPrefs.getUserId();
+      data.fold(
+        (l) => id = null,
+        (r) => id = r!,
+      );
+
+      if (id == null) {
+        return Left(Failure(error: "User id is null", statusCode: "0"));
+      }
+
+      FormData formData = FormData.fromMap({
+        'profilePicture': await MultipartFile.fromFile(image.path,
+            filename: image.path.split('/').last),
+      });
+
+      var response = await dio.put(
+        '${ApiEndpoints.updateProfile}$id',
+        data: formData,
+      );
+
+      print(response);
+      if (response.statusCode == 200) {
+        return const Right(true);
+      } else {
+        return Left(
+          Failure(
+            error: response.data["message"],
+            statusCode: response.statusCode.toString(),
+          ),
+        );
+      }
+    } on DioException catch (e) {
+      return Left(
+        Failure(
+          error: e.error.toString(),
+          statusCode: e.response?.statusCode.toString() ?? '0',
+        ),
+      );
+    }
+  }
 }

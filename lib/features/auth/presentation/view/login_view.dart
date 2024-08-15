@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:playforge/core/common/custom_elevated_button.dart';
@@ -112,18 +113,21 @@ class _LoginViewState extends ConsumerState<LoginView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              "Welcome",
-              style: TextStyle(
-                fontSize: 32,
-                fontFamily: "Epilogue",
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                letterSpacing: -0.3,
+            const Padding(
+              padding: EdgeInsets.only(top: 20, bottom: 30),
+              child: Text(
+                "Welcome",
+                style: TextStyle(
+                  fontSize: 32,
+                  fontFamily: "Epilogue",
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: -0.3,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
             CustomTextFormField(
               key: const ValueKey('email'),
               prefixIconData: Icons.person,
@@ -153,7 +157,29 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 return null;
               },
             ),
-            const SizedBox(height: 20),
+            // const SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Text("Forgot Password?")),
+                TextButton(
+                  onPressed: () {
+                    ref
+                        .read(authViewModelProvider.notifier)
+                        .openForgotPasswordView();
+                  },
+                  // style: TextButton.styleFrom(
+                  //   padding: EdgeInsets.zero, // Remove padding
+                  //   minimumSize: Size.zero, // Remove minimum size constraints
+                  // ),
+                  child: const Text(
+                    'Reset Here',
+                  ),
+                ),
+              ],
+            ),
             CustomElevatedButton(
               color: Color.fromRGBO(8, 113, 237, 1),
               onPressed: () async {
@@ -181,7 +207,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 fontFamily: 'Genera',
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -198,36 +224,55 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     style: TextStyle(color: Color.fromRGBO(48, 255, 81, 40)),
                   ),
                 ),
+                // const Text('Forgot Password'),
               ],
             ),
-            const SizedBox(height: 10),
-            CustomElevatedButton(
-              color: Colors.white,
-              onPressed: () {},
-              text: 'Sign In with Google',
-              textStyle: const TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.w900,
-                fontFamily: 'Genera',
-              ),
-              image: Image.asset('assets/icons/google.png'),
-            ),
             const SizedBox(
-              height: 10,
+              height: 20,
             ),
-            CustomElevatedButton(
-              image: Image.asset('assets/icons/facebook.png'),
-              color: Colors.white,
-              onPressed: () {},
-              text: 'Sign In with Facebook',
-              textStyle: const TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.w900,
-                fontFamily: 'Genera',
+            Center(
+              child: RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontSize: 14,
+                        color: Colors
+                            .grey.shade500, // Equivalent to 'text-gray-500'
+                      ),
+                  children: [
+                    const TextSpan(text: 'By logging in, you agree to our '),
+                    TextSpan(
+                      text: 'terms and conditions',
+                      style: TextStyle(
+                        color: Colors
+                            .grey.shade700, // Equivalent to 'text-gray-700'
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          // Handle terms and conditions tap
+                          print("Terms and Conditions tapped");
+                        },
+                    ),
+                    const TextSpan(text: ' and '),
+                    TextSpan(
+                      text: 'privacy policy',
+                      style: TextStyle(
+                        color: Colors
+                            .grey.shade700, // Equivalent to 'text-gray-700'
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          // Handle privacy policy tap
+                          print("Privacy Policy tapped");
+                        },
+                    ),
+                    const TextSpan(text: '.'),
+                  ],
+                ),
               ),
-            ),
+            )
           ],
         ),
       ),

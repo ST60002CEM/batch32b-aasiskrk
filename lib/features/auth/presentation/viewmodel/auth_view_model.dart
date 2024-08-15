@@ -92,4 +92,8 @@ class AuthViewModel extends StateNotifier<AuthState> {
   void openDashboardView() {
     dnavigator.openDashboardView();
   }
+
+  void openForgotPasswordView() {
+    lnavigator.openForgotPasswordView();
+  }
 }

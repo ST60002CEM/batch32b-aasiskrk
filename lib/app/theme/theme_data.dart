@@ -60,6 +60,7 @@ ThemeData getDarkTheme() {
     brightness: Brightness.dark,
     primaryColor: const Color.fromRGBO(23, 23, 23, 1),
     cardColor: const Color.fromRGBO(0, 0, 0, 1),
+    primaryColorDark: const Color.fromRGBO(32, 33, 36, 1),
     useMaterial3: false,
   );
 }

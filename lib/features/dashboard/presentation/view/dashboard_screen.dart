@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:playforge/features/dashboard/presentation/view/home_view.dart';
@@ -25,12 +27,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   final double shakeThreshold = 19.0;
   List<double> _accelerometerValues = [0, 0, 0];
+  StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
   bool _isBottomSheetOpen = false;
 
   @override
   void initState() {
     super.initState();
-    accelerometerEvents?.listen((AccelerometerEvent event) {
+    _accelerometerSubscription =
+        accelerometerEvents?.listen((AccelerometerEvent event) {
+      if (!mounted) return;
       setState(() {
         _accelerometerValues = [event.x, event.y, event.z];
         if (isShaking(_accelerometerValues)) {
@@ -40,6 +45,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         }
       });
     });
+  }
+
+  @override
+  void dispose() {
+    // Cancel the stream subscription when the widget is disposed
+    _accelerometerSubscription?.cancel();
+
+    super.dispose();
   }
 
   bool isShaking(List<double> values) {
@@ -137,7 +150,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         landscapeLayout: BottomNavigationBarLandscapeLayout.spread,
         showSelectedLabels: false,
         showUnselectedLabels: false,
-        backgroundColor: BottomAppBarTheme.of(context).color,
+        backgroundColor: Theme.of(context).canvasColor,
         selectedItemColor: const Color.fromRGBO(48, 255, 81, 1),
         unselectedItemColor: Colors.white,
         type: BottomNavigationBarType.fixed,

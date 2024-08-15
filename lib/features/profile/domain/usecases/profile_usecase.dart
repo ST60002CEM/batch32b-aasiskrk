@@ -21,9 +21,9 @@ class ProfileUsecase {
     return await profileRepository.getUser();
   }
 
-  // Future<Either<Failure, bool>> updateProfile(File? image) async { ///!, ?
-  //   return await profileRepository.updateProfile(image!);
-  // }
+  Future<Either<Failure, bool>> updateProfile(File? image) async {
+    return await profileRepository.updateProfile(image!);
+  }
   //
   // Future<Either<Failure, bool>> updateUser(ProfileEntity user) async {
   //   return await profileRepository.updateUser(user);

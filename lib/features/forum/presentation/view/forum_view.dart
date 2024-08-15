@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:playforge/features/forum/presentation/viewmodel/home_view_model.dart';
 import 'package:playforge/features/profile/presentation/state/profile_state.dart';
@@ -68,168 +67,224 @@ class _ForumViewState extends ConsumerState<ForumView> {
         appBar: AppBar(
           title: const Text("Create a post"),
           centerTitle: true,
-          elevation: 30,
-          backgroundColor: BottomAppBarTheme.of(context).color,
+          elevation: 0,
+          backgroundColor: Theme.of(context).canvasColor,
         ),
-        body: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  InkWell(
-                    onTap: () {
-                      showModalBottomSheet(
-                        backgroundColor: Colors.grey[300],
-                        context: context,
-                        isScrollControlled: true,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(20),
-                          ),
-                        ),
-                        builder: (context) => Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              ElevatedButton.icon(
+        body: Column(
+          children: [
+            Expanded(
+              child: Container(
+                color: Theme.of(context).primaryColorDark,
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                showModalBottomSheet(
+                                  backgroundColor:
+                                      Theme.of(context).canvasColor,
+                                  context: context,
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(20),
+                                    ),
+                                  ),
+                                  builder: (context) => Padding(
+                                    padding: const EdgeInsets.all(20),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        ElevatedButton.icon(
+                                          onPressed: () async {
+                                            await _checkCameraPermission();
+                                            _pickImage(ImageSource.camera);
+                                            Navigator.pop(context);
+                                          },
+                                          icon: const Icon(Icons.camera),
+                                          label: const Text('Camera'),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.green,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                        ),
+                                        ElevatedButton.icon(
+                                          onPressed: () {
+                                            _pickImage(ImageSource.gallery);
+                                            Navigator.pop(context);
+                                          },
+                                          icon: const Icon(Icons.image),
+                                          label: const Text('Gallery'),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.green,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: _image != null
+                                  ? Image.file(
+                                      _image!,
+                                      height: 200,
+                                      width: 200,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Container(
+                                      height: 200,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: const Icon(
+                                        Icons.add_a_photo,
+                                        color: Colors.grey,
+                                        size: 50,
+                                      ),
+                                    ),
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              key: const ValueKey('post_title'),
+                              enableSuggestions: true,
+                              textCapitalization: TextCapitalization.characters,
+                              controller: _postTitleController,
+                              decoration: InputDecoration(
+                                labelText: 'Post Title',
+                                labelStyle: const TextStyle(color: Colors.grey),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide:
+                                      const BorderSide(color: Colors.green),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a post title';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              key: const ValueKey('post_description'),
+                              controller: _postDescriptionController,
+                              maxLines: 3,
+                              decoration: InputDecoration(
+                                labelText: 'Post Description',
+                                labelStyle: const TextStyle(color: Colors.grey),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide:
+                                      const BorderSide(color: Colors.green),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a post description';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              key: ValueKey('tags'),
+                              controller: _tagsController,
+                              decoration: InputDecoration(
+                                labelText: 'Tags (comma separated)',
+                                labelStyle: const TextStyle(color: Colors.grey),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide:
+                                      const BorderSide(color: Colors.green),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter some tags';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
                                 onPressed: () async {
-                                  await _checkCameraPermission();
-                                  _pickImage(ImageSource.camera);
-                                  Navigator.pop(context);
+                                  if (_formKey.currentState!.validate()) {
+                                    ref
+                                        .read(homeViewModelProvider.notifier)
+                                        .addPost1(
+                                          PostEntity(
+                                            postPicture: _image,
+                                            postTitle:
+                                                _postTitleController.text,
+                                            postDescription:
+                                                _postDescriptionController.text,
+                                            postTags:
+                                                _tagsController.text.split(','),
+                                            postLikes: 0,
+                                            postDislikes: 0,
+                                            postViews: 0,
+                                            postedTime:
+                                                DateTime.now().toString(),
+                                            postedUserId: "",
+                                            postedFullname: "",
+                                            postComments: [],
+                                            id: '',
+                                          ),
+                                          _image,
+                                        );
+                                    forumViewModel.resetState();
+
+                                    Navigator.pop(context);
+                                  }
                                 },
-                                icon: const Icon(Icons.camera),
-                                label: const Text('Camera'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 16.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: const Text('Create Post'),
                               ),
-                              ElevatedButton.icon(
-                                onPressed: () {
-                                  _pickImage(ImageSource.gallery);
-                                  Navigator.pop(context);
-                                },
-                                icon: const Icon(Icons.image),
-                                label: const Text('Gallery'),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                    child: _image != null
-                        ? Image.file(
-                            _image!,
-                            height: 200,
-                            width: 200,
-                            fit: BoxFit.cover,
-                          )
-                        : Container(
-                            height: 200,
-                            width: 200,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(
-                              Icons.add_a_photo,
-                              color: Colors.grey,
-                              size: 50,
-                            ),
-                          ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    key: const ValueKey('post_title'),
-                    controller: _postTitleController,
-                    decoration: const InputDecoration(
-                      labelText: 'Post Title',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a post title';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    key: const ValueKey('post_description'),
-                    controller: _postDescriptionController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      labelText: 'Post Description',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a post description';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    key: ValueKey('tags'),
-                    controller: _tagsController,
-                    decoration: const InputDecoration(
-                      labelText: 'Tags (comma separated)',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter some tags';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        // String? base64Image;
-                        // if (_img != null) {
-                        //   final bytes = await _img!.readAsBytes();
-                        //   base64Image = base64Encode(bytes);
-                        // }
-                        // ForumPostEntity forumPostEntity = ForumPostEntity(
-                        //   postPicture: base64Image ?? "",
-                        //   postTitle: _postTitleController.text,
-                        //   postDescription: _postDescriptionController.text,
-                        //   postTags: _tagsController.text.split(','),
-                        //   postLikes: 0,
-                        //   postDislikes: 0,
-                        //   postViews: 0,
-                        //   postedTime: DateTime.now().toString(),
-                        //   postedUserId: currentUser.authEntity?.id,
-                        //   postedFullname: currentUser.authEntity!.fullname,
-                        //   postComments: [],
-                        // );
-
-                        ref.read(homeViewModelProvider.notifier).addPost1(
-                            PostEntity(
-                              postPicture: _image,
-                              postTitle: _postTitleController.text,
-                              postDescription: _postDescriptionController.text,
-                              postTags: _tagsController.text.split(','),
-                              postLikes: 0,
-                              postDislikes: 0,
-                              postViews: 0,
-                              postedTime: DateTime.now().toString(),
-                              postedUserId: "",
-                              postedFullname: "",
-                              postComments: [],
-                              id: '',
-                            ),
-                            _image);
-                        forumViewModel.resetState();
-
-                        Navigator.pop(context);
-                      }
-                    },
-                    child: const Text('Create Post'),
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

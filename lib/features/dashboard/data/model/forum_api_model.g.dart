@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../../../dashboard/data/model/forum_api_model.dart';
+part of 'forum_api_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
@@ -18,7 +18,10 @@ ForumApiModel _$ForumApiModelFromJson(Map<String, dynamic> json) =>
       postDislikes: (json['postDislikes'] as num).toInt(),
       postViews: (json['postViews'] as num).toInt(),
       postedTime: json['postedTime'] as String,
-      postedUserId: json['postedUser'],
+      postedUserId: json['postedUser'] is Map<String, dynamic>
+          ? UserPostedApiModel.fromJson(
+              json['postedUser'] as Map<String, dynamic>)
+          : json['postedUser'] as String,
       postedFullname: json['postedFullname'] as String,
       postComments: (json['postComments'] as List<dynamic>)
           .map((e) => CommentApiModel.fromJson(e as Map<String, dynamic>))

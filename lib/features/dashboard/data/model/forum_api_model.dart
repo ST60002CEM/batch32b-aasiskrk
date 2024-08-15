@@ -5,11 +5,15 @@ import 'package:json_annotation/json_annotation.dart';
 
 import '../../domain/entity/forum_entity.dart';
 
-part '../../../dashboard/data/model/forum_api_model.g.dart';
+part 'forum_api_model.g.dart';
 
 final forumApiModelProvider = Provider<ForumApiModel>(
   (ref) => ForumApiModel.empty(),
 );
+// postedUserId: json['postedUser'] is Map<String, dynamic>
+// ? UserPostedApiModel.fromJson(
+// json['postedUser'] as Map<String, dynamic>)
+//     : json['postedUser'] as String,
 
 @JsonSerializable()
 class ForumApiModel {

@@ -10,8 +10,8 @@ void main() async {
   // await HiveService().init();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarColor:
-          Color.fromRGBO(38, 45, 52, 1), // Match this with your AppBar color
+      statusBarColor: Color.fromRGBO(27, 27, 27, 1),
+      // Color.fromRGBO(38, 45, 52, 1), // Match this with your AppBar color
       statusBarIconBrightness: Brightness.dark,
       // Light icons on dark background
     ),

@@ -47,7 +47,6 @@ class ForumPostEntity extends Equatable {
   final String postedTime;
   final dynamic postedUserId;
   final String postedFullname;
-  final String? commentedUsers;
 
   const ForumPostEntity({
     required this.id,
@@ -62,7 +61,6 @@ class ForumPostEntity extends Equatable {
     required this.postedTime,
     required this.postedUserId,
     required this.postedFullname,
-    this.commentedUsers,
   });
 
   @override
@@ -79,7 +77,6 @@ class ForumPostEntity extends Equatable {
         postedTime,
         postedUserId,
         postedFullname,
-        commentedUsers,
       ];
 
   ForumPostEntity copyWith({
@@ -95,7 +92,6 @@ class ForumPostEntity extends Equatable {
     String? postedTime,
     dynamic postedUserId,
     String? postedFullname,
-    String? commentedUsers,
   }) {
     return ForumPostEntity(
       id: id ?? this.id,
@@ -110,7 +106,6 @@ class ForumPostEntity extends Equatable {
       postedTime: postedTime ?? this.postedTime,
       postedUserId: postedUserId ?? this.postedUserId,
       postedFullname: postedFullname ?? this.postedFullname,
-      commentedUsers: commentedUsers ?? this.commentedUsers,
     );
   }
 }

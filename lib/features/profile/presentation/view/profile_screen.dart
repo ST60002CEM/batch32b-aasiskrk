@@ -1,10 +1,11 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../app/constants/api_endpoint.dart';
-import '../../../../core/shared_prefs/user_shared_prefs.dart';
+import '../../domain/entity/profile_entity.dart';
 import '../viewmodel/profile_viewmodel.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -17,13 +18,49 @@ class ProfileScreen extends ConsumerStatefulWidget {
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   File? _selectedImage;
   File? _selectedProfile;
+  bool _isFingerprintEnabled = false;
+
+  Future<void> _pickImage(Function(File?) onImagePicked) async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      onImagePicked(File(pickedFile.path));
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(profileViewModelProvider.notifier).getCurrentUser();
+      _loadFingerprintPreference();
     });
+  }
+
+  Future<void> _loadFingerprintPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isFingerprintEnabled = prefs.getBool('fingerprint_enabled') ?? false;
+    });
+  }
+
+  Future<void> _toggleFingerprint(bool value) async {
+    final localAuth = LocalAuthentication();
+    bool didAuthenticate = false;
+    if (value) {
+      didAuthenticate = await localAuth.authenticate(
+        localizedReason: 'Please authenticate to enable fingerprint login',
+        options: const AuthenticationOptions(biometricOnly: true),
+      );
+    }
+
+    if (!value || didAuthenticate) {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _isFingerprintEnabled = value;
+      });
+      prefs.setBool('fingerprint_enabled', value);
+    }
   }
 
   @override
@@ -44,106 +81,164 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       return const Center(child: Text('No profile data'));
     }
 
-    print('Profile Entity: ${profileState.profile}');
-
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(47.0),
         child: AppBar(
-          title: const Text('Profile', style: TextStyle(fontSize: 16)),
+          title: const Text(
+            "Profile",
+            style: TextStyle(fontSize: 16),
+          ),
           centerTitle: true,
+          elevation: 0,
           backgroundColor: Theme.of(context).canvasColor,
         ),
       ),
       body: SafeArea(
         child: Container(
           color: Theme.of(context).primaryColorDark,
-          child: profileState.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundImage: NetworkImage(
-                          '${ApiEndpoints.profileImageUrl}${profile.profilePicture}',
-                        ),
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10),
+                      child: Column(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              _showEditProfileImageDialog(context);
+                            },
+                            child: CircleAvatar(
+                              radius: 50,
+                              backgroundImage: NetworkImage(
+                                '${ApiEndpoints.profileImageUrl}${profile.profilePicture}',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            profile.fullname ?? 'No Name',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: IconButton(
-                          icon: const Icon(Icons.camera, color: Colors.white),
-                          onPressed: () => _showEditProfileImageDialog(context),
-                        ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 50),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            profile.email ?? 'No Email',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.grey),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            profile.phone ?? 'No Phone Number',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.grey),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            profile.address ?? 'No Address',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.grey),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        profile.fullname ?? 'No Name',
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineMedium!
-                            .copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        profile.email ?? 'No Email',
-                        style: Theme.of(context).textTheme.labelMedium,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        profile.phone.toString() ?? 'No Phone Number',
-                        style: Theme.of(context).textTheme.labelMedium,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        profile.address ?? 'No Address',
-                        style: Theme.of(context).textTheme.labelMedium,
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton.icon(
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SizedBox(
+                      height: 35,
+                      child: ElevatedButton(
                         onPressed: () {
-                          // Handle update profile
+                          _showEditUserDetailsDialog(context, profile);
                         },
-                        icon: const Icon(Icons.edit),
-                        label: const Text('Update Profile'),
                         style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 50),
+                          backgroundColor: Colors.grey[800],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 50,
+                          ),
                         ),
+                        child: const Text('Edit Profile'),
                       ),
-                      const SizedBox(height: 16),
-                      ElevatedButton.icon(
+                    ),
+                    SizedBox(
+                      height: 35,
+                      child: ElevatedButton(
                         onPressed: () {
-                          // Handle delete account
+                          _showDeleteConfirmationDialog(context, profile.id!);
                         },
-                        icon: const Icon(Icons.delete),
-                        label: const Text('Delete Account'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          minimumSize: const Size(double.infinity, 50),
+                          backgroundColor: Colors.grey[800],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 37,
+                          ),
                         ),
+                        child: const Text('Delete Account'),
                       ),
-                      const Spacer(),
-                      TextButton.icon(
-                        onPressed: () {
-                          // Handle logout
-                          _showLogoutConfirmationDialog(context, ref);
-                        },
-                        icon: const Icon(Icons.logout),
-                        label: const Text('Logout'),
-                        style: TextButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 50),
-                        ),
-                      ),
-                    ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Enable Fingerprint Authentication'),
+                    Switch(
+                      value: _isFingerprintEnabled,
+                      onChanged: (value) {
+                        _toggleFingerprint(value);
+                      },
+                    ),
+                  ],
+                ),
+                const Spacer(),
+                TextButton.icon(
+                  onPressed: () {
+                    _showLogoutConfirmationDialog(context, ref);
+                  },
+                  icon: const Icon(Icons.logout),
+                  label: const Text('Logout'),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 20,
+                    ),
+                    backgroundColor: Colors.grey.shade200,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
                 ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
+
+// Exi
+// sting dialogs and helper methods should be placed here...
 
   void _showEditProfileImageDialog(BuildContext context) {
     showDialog(
@@ -220,7 +315,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     shape: const StadiumBorder(),
                     elevation: 10,
                     shadowColor: Colors.black,
-                    backgroundColor: Colors.green,
+                    backgroundColor: Theme.of(context).canvasColor,
                   ),
                   child: const Text(
                     'Update',
@@ -234,31 +329,127 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       },
     );
   }
-}
 
-void _showLogoutConfirmationDialog(BuildContext context, WidgetRef ref) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Logout Confirmation'),
-        content: const Text('Are you sure you want to logout?'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Dismiss the dialog
-            },
-            child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+  void _showEditUserDetailsDialog(BuildContext context, ProfileEntity profile) {
+    final nameController = TextEditingController(text: profile.fullname);
+    final phoneController = TextEditingController(text: profile.phone);
+    final addressController = TextEditingController(text: profile.address);
+    final emailController = TextEditingController(text: profile.email);
+    final passwordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit User Details'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Full Name'),
+              ),
+              TextField(
+                controller: phoneController,
+                decoration: const InputDecoration(labelText: 'Phone Number'),
+              ),
+              TextField(
+                controller: emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+              ),
+              TextField(
+                controller: addressController,
+                decoration: const InputDecoration(labelText: 'Address'),
+              ),
+              TextField(
+                controller: passwordController,
+                decoration: const InputDecoration(labelText: 'Password'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              ref.read(profileViewModelProvider.notifier).openLoginPage();
-            },
-            child: const Text('Logout', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      );
-    },
-  );
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child:
+                  const Text('Cancel', style: TextStyle(color: Colors.black)),
+            ),
+            TextButton(
+              onPressed: () {
+                final updatedProfile = profile.copyWith(
+                  fullname: nameController.text,
+                  phone: phoneController.text,
+                  address: addressController.text,
+                  email: emailController.text,
+                );
+                ref
+                    .read(profileViewModelProvider.notifier)
+                    .updateUser(updatedProfile);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Update Profile'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context, String userId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete Account'),
+          content: const Text(
+              'Are you sure you want to delete your account? This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child:
+                  const Text('Cancel', style: TextStyle(color: Colors.black)),
+            ),
+            TextButton(
+              onPressed: () {
+                ref.read(profileViewModelProvider.notifier).deleteUser(userId);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showLogoutConfirmationDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout Confirmation'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child:
+                  const Text('Cancel', style: TextStyle(color: Colors.black)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                ref.read(profileViewModelProvider.notifier).openLoginPage();
+              },
+              child: const Text('Logout', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

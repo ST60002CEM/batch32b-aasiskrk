@@ -1,12 +1,15 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:playforge/core/common/custom_elevated_button.dart';
 import 'package:playforge/core/common/custom_snackbar.dart';
 import 'package:playforge/features/auth/presentation/view/register_view.dart';
 import 'package:playforge/features/auth/presentation/viewmodel/auth_view_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/common/cutom_textform_field.dart';
+import '../../../../core/common/my_snackbar.dart';
 import '../../../dashboard/presentation/view/dashboard_screen.dart';
 
 class LoginView extends ConsumerStatefulWidget {
@@ -20,6 +23,87 @@ class _LoginViewState extends ConsumerState<LoginView> {
   TextEditingController emailFieldController = TextEditingController();
   TextEditingController passwordFieldController = TextEditingController();
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  final LocalAuthentication _localAuth = LocalAuthentication();
+  bool _canCheckBiometrics = false;
+  bool _isFingerprintEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometrics();
+    _loadFingerprintPreference();
+    _authenticateWithFingerprintIfEnabled();
+  }
+
+  Future<void> _checkBiometrics() async {
+    _canCheckBiometrics = await _localAuth.canCheckBiometrics;
+  }
+
+  Future<void> _loadFingerprintPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    _isFingerprintEnabled = prefs.getBool('fingerprintEnabled') ?? false;
+    setState(() {});
+  }
+
+  Future<void> _authenticateWithFingerprintIfEnabled() async {
+    if (_isFingerprintEnabled && _canCheckBiometrics) {
+      bool authenticated = await _localAuth.authenticate(
+        localizedReason: 'Authenticate with fingerprint to log in',
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+          stickyAuth: true,
+        ),
+      );
+
+      if (authenticated) {
+        // Log in the user after successful fingerprint authentication
+        // Use stored email and password from SharedPreferences or handle accordingly
+        final prefs = await SharedPreferences.getInstance();
+        String? storedEmail = prefs.getString('storedEmail');
+        String? storedPassword = prefs.getString('storedPassword');
+
+        if (storedEmail != null && storedPassword != null) {
+          await ref.read(authViewModelProvider.notifier).loginUser(
+                storedEmail,
+                storedPassword,
+              );
+        }
+      }
+    }
+  }
+
+  Future<void> _handleFingerprintLogin() async {
+    if (_canCheckBiometrics) {
+      bool authenticated = await _localAuth.authenticate(
+        localizedReason: 'Authenticate with fingerprint to log in',
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+          stickyAuth: true,
+        ),
+      );
+
+      if (authenticated) {
+        // Log in the user after successful fingerprint authentication
+        final prefs = await SharedPreferences.getInstance();
+        String? storedEmail = prefs.getString('storedEmail');
+        String? storedPassword = prefs.getString('storedPassword');
+
+        if (storedEmail != null && storedPassword != null) {
+          await ref.read(authViewModelProvider.notifier).loginUser(
+                storedEmail,
+                storedPassword,
+              );
+        }
+      } else {
+        showMySnackBar(
+            message: 'Fingerprint authentication failed', color: Colors.red);
+      }
+    } else {
+      showMySnackBar(
+          message: 'Biometric authentication is not available in your device');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +135,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
               Theme.of(context).brightness == Brightness.dark
                   ? 'assets/images/logowhite.png'
                   : 'assets/images/logoblack.png',
-              width: MediaQuery.of(context).size.width *
-                  0.4, // Adjust size as needed
-              height: MediaQuery.of(context).size.width *
-                  0.4, // Adjust size as needed
+              width: MediaQuery.of(context).size.width * 0.4,
+              height: MediaQuery.of(context).size.width * 0.4,
             ),
           ),
         ),
@@ -96,9 +178,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
             alignment: Alignment.centerLeft,
             child: Image.asset(
               'assets/images/logowhite.png',
-              width: MediaQuery.of(context).size.width, // Adjust size as needed
-              height: MediaQuery.of(context).size.width *
-                  0.3, // Adjust size as needed
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.width * 0.3,
             ),
           ),
         ),
@@ -157,7 +238,6 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 return null;
               },
             ),
-            // const SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -170,10 +250,6 @@ class _LoginViewState extends ConsumerState<LoginView> {
                         .read(authViewModelProvider.notifier)
                         .openForgotPasswordView();
                   },
-                  // style: TextButton.styleFrom(
-                  //   padding: EdgeInsets.zero, // Remove padding
-                  //   minimumSize: Size.zero, // Remove minimum size constraints
-                  // ),
                   child: const Text(
                     'Reset Here',
                   ),
@@ -181,22 +257,20 @@ class _LoginViewState extends ConsumerState<LoginView> {
               ],
             ),
             CustomElevatedButton(
-              color: Color.fromRGBO(8, 113, 237, 1),
+              color: const Color.fromRGBO(8, 113, 237, 1),
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   await ref.read(authViewModelProvider.notifier).loginUser(
                         emailFieldController.text,
                         passwordFieldController.text,
                       );
-                  // ref.read(authViewModelProvider.notifier).openDashboardView();
-                  // showCustomSnackBar(
-                  //   context,
-                  //   'Loggged In',
-                  //   textStyle: TextStyle(
-                  //       color: Colors.green,
-                  //       fontSize: 16,
-                  //       fontWeight: FontWeight.w900),
-                  // );
+
+                  // Save email and password in SharedPreferences for fingerprint login
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setString(
+                      'storedEmail', emailFieldController.text);
+                  await prefs.setString(
+                      'storedPassword', passwordFieldController.text);
                 }
               },
               text: 'Log In',
@@ -206,6 +280,14 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 fontWeight: FontWeight.w900,
                 fontFamily: 'Genera',
               ),
+            ),
+            const SizedBox(height: 20),
+            GestureDetector(
+              onTap: _handleFingerprintLogin,
+              child: Container(
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.all(10),
+                  child: Icon(Icons.fingerprint_rounded)),
             ),
             const SizedBox(height: 20),
             Row(
@@ -221,58 +303,14 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   },
                   child: const Text(
                     "Sign Up",
-                    style: TextStyle(color: Color.fromRGBO(48, 255, 81, 40)),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                // const Text('Forgot Password'),
               ],
             ),
-            const SizedBox(
-              height: 20,
-            ),
-            Center(
-              child: RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontSize: 14,
-                        color: Colors
-                            .grey.shade500, // Equivalent to 'text-gray-500'
-                      ),
-                  children: [
-                    const TextSpan(text: 'By logging in, you agree to our '),
-                    TextSpan(
-                      text: 'terms and conditions',
-                      style: TextStyle(
-                        color: Colors
-                            .grey.shade700, // Equivalent to 'text-gray-700'
-                        decoration: TextDecoration.underline,
-                      ),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          // Handle terms and conditions tap
-                          print("Terms and Conditions tapped");
-                        },
-                    ),
-                    const TextSpan(text: ' and '),
-                    TextSpan(
-                      text: 'privacy policy',
-                      style: TextStyle(
-                        color: Colors
-                            .grey.shade700, // Equivalent to 'text-gray-700'
-                        decoration: TextDecoration.underline,
-                      ),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          // Handle privacy policy tap
-                          print("Privacy Policy tapped");
-                        },
-                    ),
-                    const TextSpan(text: '.'),
-                  ],
-                ),
-              ),
-            )
           ],
         ),
       ),

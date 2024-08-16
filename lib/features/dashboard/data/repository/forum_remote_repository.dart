@@ -6,6 +6,7 @@ import '../../../../core/failure/failure.dart';
 import '../../../../core/failure/post_failure.dart';
 import '../../domain/entity/comment_entity.dart';
 import '../../domain/entity/forum_entity.dart';
+import '../../domain/entity/game_entity.dart';
 import '../../domain/repository/forum_repository.dart';
 import '../../../dashboard/data/data_source/remote/forum_remote_data_source.dart';
 
@@ -21,8 +22,9 @@ class ForumRemoteRepository implements IForumRepository {
   ForumRemoteRepository(this._forumRemoteDataSource);
 
   @override
-  Future<Either<Failure, List<ForumPostEntity>>> getAllForumPosts(int page) {
-    return _forumRemoteDataSource.getAllForumPosts(page);
+  Future<Either<Failure, List<ForumPostEntity>>> getAllForumPosts(
+      int page, String sortOption) {
+    return _forumRemoteDataSource.getAllForumPosts(page, sortOption);
   }
 
   @override
@@ -82,5 +84,11 @@ class ForumRemoteRepository implements IForumRepository {
   @override
   Future<Either<Failure, bool>> viewPost(String postId) {
     return _forumRemoteDataSource.viewPost(postId);
+  }
+
+  @override
+  Future<Either<Failure, List<GameEntity>>> searchGames(
+      String query, String category, String pageToken) {
+    return _forumRemoteDataSource.searchGamesApi(query, category, pageToken);
   }
 }

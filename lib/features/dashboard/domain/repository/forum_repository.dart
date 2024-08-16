@@ -9,6 +9,7 @@ import '../../data/repository/forum_local_repository.dart';
 import '../../data/repository/forum_remote_repository.dart';
 import '../entity/comment_entity.dart';
 import '../entity/forum_entity.dart';
+import '../entity/game_entity.dart';
 
 final forumRepositoryProvider = Provider<IForumRepository>((ref) {
   final checkConnectivity = ref.read(connectivityStatusProvider);
@@ -22,7 +23,8 @@ final forumRepositoryProvider = Provider<IForumRepository>((ref) {
 
 abstract class IForumRepository {
   Future<Either<Failure, bool>> addForumPost(ForumPostEntity post, File? image);
-  Future<Either<Failure, List<ForumPostEntity>>> getAllForumPosts(int page);
+  Future<Either<Failure, List<ForumPostEntity>>> getAllForumPosts(
+      int page, String sortOption);
   Future<Either<Failure, List<ForumPostEntity>>> getForumPost();
   Future<Either<PostFailure, List<ForumPostEntity>>> searchAllPost(
       String searchTerm);
@@ -35,4 +37,6 @@ abstract class IForumRepository {
       String postId, ForumPostEntity updatedPostEntity);
   Future<Either<Failure, bool>> deletePost(String postId);
   Future<Either<Failure, bool>> viewPost(String postId);
+  Future<Either<Failure, List<GameEntity>>> searchGames(
+      String query, String category, String pageToken);
 }

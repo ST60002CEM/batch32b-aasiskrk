@@ -6,6 +6,7 @@ import '../../../../core/failure/failure.dart';
 import '../../../../core/failure/post_failure.dart';
 import '../entity/comment_entity.dart';
 import '../entity/forum_entity.dart';
+import '../entity/game_entity.dart';
 import '../repository/forum_repository.dart';
 
 final forumUseCaseProvider = Provider((ref) {
@@ -23,8 +24,8 @@ class ForumUseCase {
   }
 
   Future<Either<Failure, List<ForumPostEntity>>> getAllForumPosts(
-      int page) async {
-    return await _forumRepository.getAllForumPosts(page);
+      int page, String sortOption) async {
+    return await _forumRepository.getAllForumPosts(page, sortOption);
   }
 
   Future<Either<Failure, List<ForumPostEntity>>> getForumPost() async {
@@ -62,7 +63,15 @@ class ForumUseCase {
   Future<Either<Failure, bool>> deletePost(String postId) async {
     return await _forumRepository.deletePost(postId);
   }
+
   Future<Either<Failure, bool>> viewPost(String postId) async {
     return await _forumRepository.viewPost(postId);
+  }
+
+  // New Method to search games using SerpApi
+  Future<Either<Failure, List<GameEntity>>> searchGamesApi(
+      String query, String category, String sectionPageToken) async {
+    return await _forumRepository.searchGames(
+        query, category, sectionPageToken);
   }
 }

@@ -58,6 +58,9 @@ dependencies:
   all_sensors2: ^1.0.1
   intl: ^0.19.0
   vibration: ^1.9.0
+  shimmer: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+  local_auth: ^2.3.0
 
 
 dev_dependencies:
@@ -72,6 +75,20 @@ dev_dependencies:
   flutter_lints: ^3.0.0
   build_runner: ^2.4.11
   hive_generator: ^2.0.1
+  flutter_launcher_icons: ^0.13.1
+
+#flutter_launcher_icons:
+#  android: "launcher_icon"
+#  ios: true
+#  image_path: "assets/icon/finallogo.png"
+#  min_sdk_android: 21 # android min sdk min:16, default 21
+#  windows:
+#    generate: true
+#    image_path: "assets/icon/finallogo.png"
+#    icon_size: 48 # min:48, max:256, default: 48
+#  macos:
+#    generate: true
+#    image_path: "assets/icon/finallogo.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import '../../domain/entity/forum_entity.dart';
+import '../../domain/entity/game_entity.dart';
 
 class ForumState {
   final bool isLoading;
@@ -11,6 +12,7 @@ class ForumState {
   final ForumPostEntity? singlePost;
   final bool hasReachedMax;
   final int page;
+  final List<GameEntity> games;
 
   ForumState({
     required this.isLoading,
@@ -21,6 +23,7 @@ class ForumState {
     required this.hasReachedMax,
     required this.userPosts,
     this.singlePost,
+    required this.games,
   });
 
   factory ForumState.initial() {
@@ -33,6 +36,7 @@ class ForumState {
       page: 0,
       userPosts: [],
       singlePost: null,
+      games: [],
     );
   }
 
@@ -45,6 +49,7 @@ class ForumState {
     bool? hasReachedMax,
     List<ForumPostEntity>? userPosts,
     ForumPostEntity? singlePost,
+    List<GameEntity>? games,
   }) {
     return ForumState(
       isLoading: isLoading ?? this.isLoading,
@@ -55,6 +60,7 @@ class ForumState {
       userPosts: userPosts ?? this.userPosts,
       searchResults: searchResults ?? this.searchResults,
       singlePost: singlePost ?? this.singlePost,
+      games: games ?? this.games,
     );
   }
 }

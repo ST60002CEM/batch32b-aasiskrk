@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:playforge/features/dashboard/presentation/view/single_post_view.dart';
 import 'package:playforge/features/forum/presentation/view/forum_view.dart';
@@ -8,7 +10,9 @@ import 'package:playforge/features/forum/presentation/viewmodel/home_view_model.
 import '../../../../core/common/custom_game_card.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import '../../../../app/constants/api_endpoint.dart';
+import '../../../../core/common/shimmer_post.dart';
 import '../../data/model/forum_api_model.dart';
+import '../../data/model/game_info.dart';
 import '../../domain/entity/forum_entity.dart';
 import 'package:intl/intl.dart';
 
@@ -26,6 +30,48 @@ class _HomeViewState extends ConsumerState<HomeView> {
   bool isLoading = false;
   int currentPage = 1;
 
+  List<GameInfo> games = [];
+  bool loading = true;
+  String error = '';
+  String query = 'games';
+  String category = '';
+  String sectionPageToken = '';
+
+  String _selectedSortOption = 'mostRecent';
+  final TextEditingController _searchController = TextEditingController();
+
+  // Method to handle search
+  void _searchGames() {
+    final query = _searchController.text.trim();
+    if (query.isNotEmpty) {
+      ref.read(forumViewModelProvider.notifier).searchGamesApi(
+            query,
+            category, // Use appropriate category if needed
+            sectionPageToken,
+          );
+    }
+  }
+
+  List<DropdownMenuItem<String>> get _dropdownMenuItems {
+    return [
+      DropdownMenuItem(child: Text(" Most Recent"), value: "mostRecent"),
+      DropdownMenuItem(child: Text(" Oldest"), value: "oldest"),
+      DropdownMenuItem(child: Text(" Most Liked"), value: "mostLiked"),
+      DropdownMenuItem(child: Text(" Most Viewed"), value: "mostViews"),
+    ];
+  }
+
+  void _onSortChanged(String? newValue) {
+    setState(() {
+      _selectedSortOption = newValue!;
+      // Fetch posts based on the selected sorting option and reset the state
+      ref.read(forumViewModelProvider.notifier).getAllPosts(
+            sortOption: _selectedSortOption,
+            reset: true,
+          );
+    });
+  }
+
   String formatDateTime(String isoDate) {
     try {
       final DateTime dateTime = DateTime.parse(isoDate);
@@ -38,6 +84,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
   @override
   void dispose() {
+    _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -69,7 +116,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
             length: 2, // Number of tabs
             child: SafeArea(
               child: Container(
-                color: Theme.of(context).canvasColor,
+                color: Theme.of(context).primaryColorDark,
                 child: Column(
                   children: [
                     // Custom Tab Bar
@@ -103,6 +150,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                         ],
                       ),
                     ),
+
                     // Tab Bar View
                     Expanded(
                       child: TabBarView(
@@ -111,6 +159,51 @@ class _HomeViewState extends ConsumerState<HomeView> {
                             alignment: Alignment.topCenter,
                             child: Column(
                               children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0, vertical: 8.0),
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      border: Border.all(
+                                          color: Colors.green, width: 1),
+                                    ),
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<String>(
+                                        value: _selectedSortOption,
+                                        items: _dropdownMenuItems.map(
+                                            (DropdownMenuItem<String> item) {
+                                          return DropdownMenuItem<String>(
+                                            value: item.value,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: item.child,
+                                            ),
+                                          );
+                                        }).toList(),
+                                        onChanged: _onSortChanged,
+                                        isExpanded: true,
+                                        icon: const Padding(
+                                          padding: EdgeInsets.only(right: 8.0),
+                                          child: Icon(Icons.arrow_drop_down,
+                                              color: Colors.green),
+                                        ),
+                                        dropdownColor:
+                                            Theme.of(context).canvasColor,
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.color,
+                                          fontSize: 16,
+                                        ),
+                                        underline: Container(),
+                                        elevation: 8,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                                 Expanded(
                                   child: LiquidPullToRefresh(
                                     showChildOpacityTransition: false,
@@ -345,22 +438,58 @@ class _HomeViewState extends ConsumerState<HomeView> {
                           Center(
                             child: Padding(
                               padding: const EdgeInsets.all(5),
-                              child: GridView.builder(
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: noOfButtons,
-                                  crossAxisSpacing: 5,
-                                  mainAxisSpacing: 5,
-                                  childAspectRatio: 0.9,
-                                ),
-                                itemCount: 10,
-                                itemBuilder: (context, index) {
-                                  return CustomGameCard(
-                                    gameName: 'Game Title $index',
-                                    gameImage:
-                                        'https://via.placeholder.com/800x400',
-                                  );
-                                },
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0, vertical: 8.0),
+                                    child: TextField(
+                                      controller: _searchController,
+                                      onSubmitted: (value) => _searchGames(),
+                                      decoration: InputDecoration(
+                                        hintText: 'Search for games...',
+                                        prefixIcon: Icon(Icons.search),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: LiquidPullToRefresh(
+                                      showChildOpacityTransition: false,
+                                      height: 50,
+                                      animSpeedFactor: 2,
+                                      color: Theme.of(context).primaryColorDark,
+                                      backgroundColor: Colors.green,
+                                      onRefresh: () async {
+                                        // Refresh the games list
+                                        _searchGames();
+                                      },
+                                      child: GridView.builder(
+                                        gridDelegate:
+                                            SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: noOfButtons,
+                                          crossAxisSpacing: 5,
+                                          mainAxisSpacing: 5,
+                                          childAspectRatio: 0.9,
+                                        ),
+                                        itemCount: forumState.games.length,
+                                        itemBuilder: (context, index) {
+                                          final game = forumState.games[index];
+                                          return CustomGameCard(
+                                            gameName: game.title,
+                                            gameImage: game.thumbnail,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  if (forumState.isLoading)
+                                    const LinearProgressIndicator(
+                                        color: Colors.green),
+                                ],
                               ),
                             ),
                           ),

@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/constants/api_endpoint.dart';
+import '../../../../core/common/shimmer_post_item.dart';
 import '../../../dashboard/domain/entity/forum_entity.dart';
 import '../../../dashboard/presentation/viewmodel/forum_view_model.dart';
 
@@ -35,18 +37,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     return SafeArea(
       child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(47.0),
-          child: AppBar(
-            title: const Text(
-              "Search Posts",
-              style: TextStyle(fontSize: 16),
-            ),
-            centerTitle: true,
-            elevation: 0,
-            backgroundColor: Theme.of(context).canvasColor,
-          ),
-        ),
+        // appBar: PreferredSize(
+        //   preferredSize: const Size.fromHeight(47.0),
+        //   child: AppBar(
+        //     title: const Text(
+        //       "Search Posts",
+        //       style: TextStyle(fontSize: 16),
+        //     ),
+        //     centerTitle: true,
+        //     elevation: 0,
+        //     backgroundColor: Theme.of(context).canvasColor,
+        //   ),
+        // ),
         body: Container(
           color: Theme.of(context).primaryColorDark,
           child: Column(
@@ -54,6 +56,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
+                  cursorColor: Colors.green,
+                  enableSuggestions: true,
                   controller: _searchController,
                   decoration: InputDecoration(
                     filled: true,
@@ -80,20 +84,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
               Expanded(
                 child: state.isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                        color: Colors.green,
-                      ))
+                    ? ListView.builder(
+                        itemCount: 6, // Number of shimmer items
+                        itemBuilder: (context, index) =>
+                            const ShimmerPostItem(),
+                      )
                     : state.searchResults.isEmpty
                         ? const Center(
                             child: Text('No posts found',
                                 style: TextStyle(color: Colors.white)))
-                        : ListView.separated(
+                        : ListView.builder(
                             itemCount: state.searchResults.length,
-                            separatorBuilder: (context, index) => const Divider(
-                              height: 1,
-                              color: Colors.grey,
-                            ),
                             itemBuilder: (context, index) {
                               final search = state.searchResults[index];
                               return _buildPostItem(search);
@@ -109,17 +110,24 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   Widget _buildPostItem(ForumPostEntity search) {
     return Card(
-      color: Theme.of(context).canvasColor,
+      elevation: 0,
+      color: Theme.of(context).primaryColorDark,
       child: ListTile(
         leading: search.postPicture != null
-            ? Image.network(
-                '${ApiEndpoints.imageBaseUrl}${(search.postPicture).toString() ?? ''}',
-                width: 60,
-                height: 60,
+            ? ClipRRect(
+                borderRadius:
+                    BorderRadius.circular(8.0), // Adjust the radius as needed
+                child: Image.network(
+                  '${ApiEndpoints.imageBaseUrl}${(search.postPicture).toString() ?? ''}',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
               )
             : const Icon(Icons.image, color: Colors.white),
-        title:
-            Text(search.postTitle, style: const TextStyle(color: Colors.white)),
+        title: Text(search.postTitle,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.white)),
         subtitle: Text(search.postDescription,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

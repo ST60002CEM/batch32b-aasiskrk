@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:playforge/features/dashboard/presentation/navigator/post_navigator.dart';
 import 'package:playforge/features/forum/presentation/viewmodel/home_view_model.dart';
+import 'package:playforge/features/profile/presentation/viewmodel/profile_viewmodel.dart';
 import 'package:vibration/vibration.dart';
 import 'dart:io';
 
 import '../../../../app/constants/api_endpoint.dart';
+import '../../../../core/common/single_post_shimmer.dart';
 import '../../../../core/shared_prefs/user_shared_prefs.dart';
 import '../../../dashboard/domain/entity/forum_entity.dart';
 import '../../../dashboard/presentation/viewmodel/forum_view_model.dart';
@@ -27,6 +29,8 @@ class _SinglePostViewState extends ConsumerState<SinglePostView> {
   UserSharedPrefs? userSharedPrefs;
   final TextEditingController _commentController = TextEditingController();
   bool _isCommenting = false;
+  final ScrollController _scrollController =
+      ScrollController(); // Add ScrollController
 
   @override
   void initState() {
@@ -40,6 +44,7 @@ class _SinglePostViewState extends ConsumerState<SinglePostView> {
   @override
   void dispose() {
     _commentController.dispose();
+    _scrollController.dispose(); // D
     super.dispose();
   }
 
@@ -63,7 +68,6 @@ class _SinglePostViewState extends ConsumerState<SinglePostView> {
 
   Future<void> _addComment(String postId, AddCommentEntity comment) async {
     await ref.read(forumViewModelProvider.notifier).addComment(postId, comment);
-    await _loadPostDetails(postId);
   }
 
   Future<void> _loadPostDetails(String postId) async {
@@ -73,14 +77,13 @@ class _SinglePostViewState extends ConsumerState<SinglePostView> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(forumViewModelProvider);
+    final prof = ref.read(profileViewModelProvider);
+
     final post = state.singlePost;
+    final profile = prof.profile;
 
     if (state.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          color: Colors.green,
-        ),
-      );
+      return SinglePostShimmer();
     }
 
     if (state.error != null) {
@@ -126,6 +129,7 @@ class _SinglePostViewState extends ConsumerState<SinglePostView> {
               children: [
                 Expanded(
                   child: SingleChildScrollView(
+                    controller: _scrollController,
                     child: Container(
                       color: Theme.of(context).primaryColorDark,
                       child: Card(
@@ -191,7 +195,7 @@ class _SinglePostViewState extends ConsumerState<SinglePostView> {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 15.0),
                               child: Text(
-                                post.postTitle,
+                                post.postDescription,
                                 style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w900,
@@ -336,16 +340,25 @@ class _SinglePostViewState extends ConsumerState<SinglePostView> {
                         icon: const Icon(Icons.send),
                         onPressed: _isCommenting
                             ? () async {
-                                await _addComment(
-                                    widget.postId,
-                                    AddCommentEntity(
-                                      userId: "",
-                                      comment: _commentController.text,
-                                      commentedAt: DateTime.now().toString(),
-                                      userName: "",
-                                    ));
+                                await ref
+                                    .read(forumViewModelProvider.notifier)
+                                    .addComment(
+                                        widget.postId,
+                                        AddCommentEntity(
+                                          userId: "",
+                                          comment: _commentController.text,
+                                          commentedAt:
+                                              DateTime.now().toString(),
+                                          userName: profile!.fullname,
+                                        ));
+
                                 _commentController.clear();
+
                                 setState(() {
+                                  _scrollController.jumpTo(_scrollController
+                                      .position.maxScrollExtent);
+                                  FocusScope.of(context).unfocus();
+
                                   _isCommenting = false;
                                 });
                               }

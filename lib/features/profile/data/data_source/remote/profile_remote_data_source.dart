@@ -46,10 +46,7 @@ class ProfileRemoteDataSource {
         (r) => id = r,
       );
       if (id != null) {
-        print('User ID Fetched');
-      } else {
-        print("No userId found or an error occurred.");
-      }
+      } else {}
 
       var response = await dio.get(
         '${ApiEndpoints.currentUser}$id',
@@ -152,7 +149,6 @@ class ProfileRemoteDataSource {
         data: formData,
       );
 
-      print(response);
       if (response.statusCode == 200) {
         return const Right(true);
       } else {
@@ -168,6 +164,111 @@ class ProfileRemoteDataSource {
         Failure(
           error: e.error.toString(),
           statusCode: e.response?.statusCode.toString() ?? '0',
+        ),
+      );
+    }
+  }
+
+  Future<Either<Failure, bool>> updateUser(ProfileEntity user) async {
+    try {
+      String? token;
+      var data = await userSharedPrefs.getUserToken();
+      data.fold(
+        (l) => token = null,
+        (r) => token = r!,
+      );
+
+      if (token == null) {
+        return Left(Failure(error: "Token is null", statusCode: "0"));
+      }
+
+      Map<String, dynamic> formDataMap = {
+        "fullName": user.fullname,
+        "email": user.email,
+        "address": user.address,
+        "phone": user.phone,
+      };
+
+      if (user.password != null) {
+        formDataMap['password'] = user.password;
+      }
+
+      FormData formData = FormData.fromMap(formDataMap);
+
+      var response = await dio.put(
+        '${ApiEndpoints.updateUser}${user.id}',
+        data: formData,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      if (response.statusCode == 200) {
+        return const Right(true);
+      } else {
+        return Left(
+          Failure(
+            error: response.data["message"],
+            statusCode: response.statusCode.toString(),
+          ),
+        );
+      }
+    } on DioException catch (e, stackTrace) {
+      return Left(
+        Failure(
+          error: e.error.toString(),
+          statusCode: e.response?.statusCode.toString() ?? '0',
+        ),
+      );
+    } catch (e, stackTrace) {
+      return Left(
+        Failure(
+          error: e.toString(),
+          statusCode: '0',
+        ),
+      );
+    }
+  }
+
+  Future<Either<Failure, bool>> deleteUser(String userId) async {
+    try {
+      String? token;
+      var data = await userSharedPrefs.getUserToken();
+      data.fold(
+        (l) => token = null,
+        (r) => token = r!,
+      );
+
+      if (token == null) {
+        return Left(Failure(error: "Token is null", statusCode: "0"));
+      }
+
+      // Send the DELETE request to the backend
+      var response = await dio.delete(
+        '${ApiEndpoints.deleteUser}$userId',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      if (response.statusCode == 201) {
+        return const Right(true);
+      } else {
+        return Left(
+          Failure(
+            error: response.data["message"] ?? "Failed to delete user",
+            statusCode: response.statusCode.toString(),
+          ),
+        );
+      }
+    } on DioException catch (e, stackTrace) {
+      return Left(
+        Failure(
+          error: e.error.toString(),
+          statusCode: e.response?.statusCode.toString() ?? '0',
+        ),
+      );
+    } catch (e, stackTrace) {
+      return Left(
+        Failure(
+          error: e.toString(),
+          statusCode: '0',
         ),
       );
     }

@@ -10,9 +10,9 @@ ProfileApiModel _$ProfileApiModelFromJson(Map<String, dynamic> json) =>
     ProfileApiModel(
       id: json['_id'] as String?,
       fullname: json['fullName'] as String,
-      phone: (json['phone'] as num).toInt(),
+      phone: json['phone'] as String,
       email: json['email'] as String,
-      password: json['password'] as String,
+      password: json['password'] as String?,
       profilePicture: json['profilePicture'] as String?,
       address: json['address'] as String,
       isAdmin: json['isAdmin'] as bool,

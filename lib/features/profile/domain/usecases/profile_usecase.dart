@@ -24,10 +24,14 @@ class ProfileUsecase {
   Future<Either<Failure, bool>> updateProfile(File? image) async {
     return await profileRepository.updateProfile(image!);
   }
-  //
-  // Future<Either<Failure, bool>> updateUser(ProfileEntity user) async {
-  //   return await profileRepository.updateUser(user);
-  // }
+
+  Future<Either<Failure, bool>> updateUser(ProfileEntity user) async {
+    return await profileRepository.updateUser(user);
+  }
+
+  Future<Either<Failure, bool>> deleteUser(String userId) async {
+    return await profileRepository.deleteUser(userId);
+  }
   //
   // Future<Either<PostFailure, List<ProductEntity>>> getProduct() async{
   //   return await profileRepository.getProduct();

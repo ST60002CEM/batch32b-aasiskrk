@@ -13,7 +13,6 @@ final profileRepositoryProvider = Provider<IProfileRepository>((ref) {
 abstract class IProfileRepository {
   Future<Either<Failure, ProfileEntity>> getUser();
   Future<Either<Failure, bool>> updateProfile(File image);
-// Future<Either<PostFailure, List<ProductEntity>>> getProduct();
-  // Future<Either<Failure, bool>> updateProfile(File image);
-  // Future<Either<Failure, bool>> updateUser(ProfileEntity user);
+  Future<Either<Failure, bool>> updateUser(ProfileEntity user);
+  Future<Either<Failure, bool>> deleteUser(String userId);
 }

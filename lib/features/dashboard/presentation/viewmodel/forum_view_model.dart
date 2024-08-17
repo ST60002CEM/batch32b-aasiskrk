@@ -7,6 +7,7 @@ import 'package:playforge/core/failure/failure.dart';
 import 'package:playforge/core/shared_prefs/user_shared_prefs.dart';
 import 'package:playforge/features/dashboard/presentation/navigator/home_navigator.dart';
 import 'package:playforge/features/dashboard/presentation/navigator/post_navigator.dart';
+import '../../../../app/constants/api_endpoint.dart';
 import '../../../../core/common/my_snackbar.dart';
 import '../../domain/entity/comment_entity.dart';
 import '../../domain/entity/forum_entity.dart';
@@ -34,15 +35,17 @@ class ForumViewModel extends StateNotifier<ForumState> {
     getAllPosts();
   }
 
-  Future<void> getAllPosts({int? page}) async {
+  Future<void> getAllPosts(
+      {int? page, String sortOption = "mostRecent", bool reset = false}) async {
     state = state.copyWith(isLoading: true);
     final currentState = state;
-    final currentPage = page ?? currentState.page + 1;
-    final posts = currentState.posts;
-    final hasReachedMax = currentState.hasReachedMax;
+    final currentPage = reset ? 1 : (page ?? state.page + 1);
+    final currentPosts = reset ? [] : state.posts;
+    final hasReachedMax = state.hasReachedMax && !reset;
 
     if (!hasReachedMax) {
-      final result = await forumUseCase.getAllForumPosts(currentPage);
+      final result =
+          await forumUseCase.getAllForumPosts(currentPage, sortOption);
       result.fold(
         (failure) =>
             state = state.copyWith(hasReachedMax: true, isLoading: false),
@@ -51,8 +54,9 @@ class ForumViewModel extends StateNotifier<ForumState> {
             state = state.copyWith(hasReachedMax: true, isLoading: false);
           } else {
             state = state.copyWith(
-              posts: currentPage == 1 ? data : [...posts, ...data],
+              posts: currentPage == 1 ? data : [...currentPosts, ...data],
               page: currentPage,
+              hasReachedMax: data.length < ApiEndpoints.limitPage,
               isLoading: false,
             );
           }
@@ -200,7 +204,34 @@ class ForumViewModel extends StateNotifier<ForumState> {
       },
       (success) {
         showMySnackBar(message: 'Comment added successfully');
-        // Optionally, you can also update the state with the new comment
+
+        // Convert AddCommentEntity to CommentEntity
+        final newComment = CommentEntity(
+          comment: comment.comment,
+          userId: comment.userId,
+          commentedAt: DateTime.now(), userName: comment.userName,
+          // Add other fields from AddCommentEntity that are necessary
+        );
+
+        // Update the state by adding the new comment to the post's comment list
+        final updatedPosts = state.posts.map((post) {
+          if (post.id == postId) {
+            return post.copyWith(
+              postComments: [...post.postComments, newComment],
+            );
+          }
+          return post;
+        }).toList();
+
+        // Update the state for singlePost if it matches the commented post
+        final updatedSinglePost = state.singlePost?.id == postId
+            ? state.singlePost!.copyWith(
+                postComments: [...state.singlePost!.postComments, newComment],
+              )
+            : state.singlePost;
+
+        state = state.copyWith(posts: updatedPosts);
+        state = state.copyWith(singlePost: updatedSinglePost);
       },
     );
   }
@@ -228,8 +259,52 @@ class ForumViewModel extends StateNotifier<ForumState> {
       (success) {
         showMySnackBar(message: 'Post deleted successfully');
         // Optionally, refresh the list of posts after deleting
-        getAllPosts();
+        state = state.copyWith(
+            posts: state.posts.where((post) => post.id != postId).toList(),
+            userPosts:
+                state.userPosts.where((post) => post.id != postId).toList());
       },
     );
+  }
+
+  Future<void> searchGamesApi(
+      String query, String category, String? sectionPageToken) async {
+    state = state.copyWith(isLoading: true); // Show loading state
+
+    try {
+      final result = await forumUseCase.searchGamesApi(
+          query, category, sectionPageToken ?? '');
+
+      result.fold(
+        (failure) {
+          state = state.copyWith(
+            isLoading: false,
+            error: failure.error,
+          );
+          showMySnackBar(message: failure.error, color: Colors.red);
+        },
+        (games) {
+          print("Fetched Games: $games"); //
+          state = state.copyWith(
+            isLoading: false,
+            games: games,
+          );
+        },
+      );
+    } on Exception catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'An unexpected error occurred',
+      );
+      showMySnackBar(
+          message: 'An unexpected error occurred', color: Colors.red);
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'An unexpected error occurred',
+      );
+      showMySnackBar(
+          message: 'An unexpected error occurred', color: Colors.red);
+    }
   }
 }

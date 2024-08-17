@@ -5,14 +5,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:playforge/core/shared_prefs/user_shared_prefs.dart';
 import 'package:playforge/features/dashboard/data/dto/get_all_forum_post_dto.dart';
 import 'package:playforge/features/dashboard/data/dto/get_single_post_dto.dart';
+import 'package:playforge/features/dashboard/domain/entity/game_entity.dart';
 import '../../../../../app/constants/api_endpoint.dart';
 import '../../../../../core/failure/failure.dart';
 import '../../../../../core/failure/post_failure.dart';
 import '../../../../../core/networking/remote/http_service.dart';
 import '../../../domain/entity/comment_entity.dart';
 import '../../../domain/entity/forum_entity.dart';
-import '../../model/add_comment_api_model.dart';
 import '../../model/forum_api_model.dart';
+import '../../model/game_info.dart';
 
 final httpServiceProvider = Provider.autoDispose<Dio>(
   (ref) => HttpService(Dio()).dio,
@@ -35,12 +36,13 @@ class ForumRemoteDataSource {
   });
 
   Future<Either<Failure, List<ForumPostEntity>>> getAllForumPosts(
-      int page) async {
+      int page, String sortOption) async {
     try {
       final response =
           await dio.get(ApiEndpoints.getPagination, queryParameters: {
         'page': page,
         'limit': ApiEndpoints.limitPage,
+        'sort': sortOption,
       });
       if (response.statusCode == 201) {
         final getAllForumPostDTO = GetAllForumPostDTO.fromJson(response.data);
@@ -438,6 +440,62 @@ class ForumRemoteDataSource {
       return Left(Failure(
           error: e.error.toString(),
           statusCode: e.response?.statusCode.toString() ?? '0'));
+    }
+  }
+
+  Future<Either<Failure, List<GameEntity>>> searchGamesApi(
+      String query, String category, String sectionPageToken) async {
+    try {
+      final response = await dio.get(
+        ApiEndpoints.gameSearch,
+        queryParameters: {
+          'query': query,
+          'category': category,
+          'sectionPageToken': sectionPageToken,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        if (response.data != null &&
+            response.data['data'] != null &&
+            response.data['data']['organic_results'] != null) {
+          final List organicResults = response.data['data']['organic_results'];
+
+          List<GameEntity> gameEntityList = [];
+
+          for (var result in organicResults) {
+            if (result['items'] != null && result['items'] is List) {
+              for (var item in result['items']) {
+                gameEntityList.add(GameEntity(
+                  productId: item['product_id'] ?? "",
+                  title: item['title'] ?? "",
+                  author: item['author'] ?? "",
+                  thumbnail: item['thumbnail'] ?? "",
+                  link: item['link'] ?? "",
+                  rating:
+                      item['rating'] != null ? item['rating'].toDouble() : 0.0,
+                ));
+              }
+            }
+          }
+
+          return Right(gameEntityList);
+        } else {
+          return Left(Failure(
+              error: 'Invalid data structure',
+              statusCode: response.statusCode.toString()));
+        }
+      } else {
+        return Left(Failure(
+            error: response.data["message"] ?? 'Unknown error',
+            statusCode: response.statusCode.toString()));
+      }
+    } on DioException catch (e) {
+      return Left(Failure(
+          statusCode: e.response?.statusCode.toString() ?? '0',
+          error: e.message ?? 'An error occurred'));
+    } catch (e) {
+      return Left(Failure(error: e.toString(), statusCode: '0'));
     }
   }
 }

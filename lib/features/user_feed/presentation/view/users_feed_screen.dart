@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,9 +6,7 @@ import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:playforge/core/shared_prefs/user_shared_prefs.dart';
 
 import '../../../../app/constants/api_endpoint.dart';
-import '../../../../core/common/custom_game_card.dart';
 import '../../../dashboard/presentation/viewmodel/forum_view_model.dart';
-import '../../../forum/presentation/view/forum_view.dart';
 
 class UsersFeedScreen extends ConsumerStatefulWidget {
   const UsersFeedScreen({Key? key}) : super(key: key);
@@ -34,12 +31,15 @@ class _UsersFeedScreenState extends ConsumerState<UsersFeedScreen> {
   int noOfButtons = 0;
   int noOfPosts = 0;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   ref.read(forumViewModelProvider.notifier).getUsersPosts();
-  //   userSharedPrefs;
-  // }
+  @override
+  void initState() {
+    super.initState();
+    // Initialize shared preferences and fetch current user ID
+    userSharedPrefs = ref.read(userSharedPrefsProvider);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(forumViewModelProvider.notifier).getUsersPosts();
+    });
+  }
 
   @override
   void dispose() {
@@ -101,14 +101,14 @@ class _UsersFeedScreenState extends ConsumerState<UsersFeedScreen> {
                                   controller: _scrollController,
                                   gridDelegate:
                                       SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: noOfPosts,
-                                    crossAxisSpacing: 2,
-                                    mainAxisSpacing: 2,
-                                    childAspectRatio: 1.05,
-                                  ),
+                                          crossAxisCount: noOfPosts,
+                                          crossAxisSpacing: 2,
+                                          mainAxisSpacing: 5,
+                                          childAspectRatio: 0.8),
                                   itemCount: forumState.userPosts.length,
                                   itemBuilder: (context, index) {
                                     final post = forumState.userPosts[index];
+                                    const bool isPostOwner = true;
 
                                     return GestureDetector(
                                       onTap: () {
@@ -278,6 +278,23 @@ class _UsersFeedScreenState extends ConsumerState<UsersFeedScreen> {
                                                       ),
                                                     ],
                                                   ),
+                                                  // Conditionally show delete button if the current user is the owner
+                                                  if (isPostOwner)
+                                                    IconButton(
+                                                      icon: const Icon(
+                                                        Icons.delete,
+                                                        size: 18,
+                                                        color: Colors.red,
+                                                      ),
+                                                      onPressed: () async {
+                                                        await ref
+                                                            .read(
+                                                                forumViewModelProvider
+                                                                    .notifier)
+                                                            .deletePost(
+                                                                post.id);
+                                                      },
+                                                    ),
                                                 ],
                                               ),
                                             ),

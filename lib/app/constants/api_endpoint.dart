@@ -20,6 +20,9 @@ class ApiEndpoints {
   // static const String imageUrl = "http://10.0.2.2:5000/uploads/";
   static const String uploadImage = "auth/uploadImage";
   static const String currentUser = "user/get_user/";
+  static const String updateProfile = "user/update_user_image/";
+  static const String updateUser = "user/update_profile/";
+  static const String deleteUser = "user/delete_user/";
 
   // ====================== Forum Routes ======================
   static const String search = "forum/search";
@@ -28,10 +31,19 @@ class ApiEndpoints {
   static const String getPagination = "forum/pagination";
   static const String getSingleForumPost = "forum/get_single_post/";
   static const String getUserPost = "forum/user_posts/";
-
-  static const String editPost = "forum/edit_post/";
+  static const String likePost = "/forum/";
+  static const String dislikePost = "/forum/";
+  static const String viewPost = "/forum/";
+  static const String editPost = "/forum/edit_post/";
   static const String deletePost = "forum/delete_post/";
   static const String addComment = "forum/add_comment/";
   static const String deleteComment = "forum/delete_comment/";
   static const String getDetails = "forum/getDetails/";
+
+  //Forgot Password
+  static const String forgotPassword = "/user/forgot_password";
+  static const String verifyOtp = "/user/verify_otp";
+
+  //Game
+  static const String gameSearch = "forum/games";
 }

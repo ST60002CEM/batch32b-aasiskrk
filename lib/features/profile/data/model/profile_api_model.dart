@@ -11,9 +11,9 @@ class ProfileApiModel {
   @JsonKey(name: 'fullName')
   final String fullname;
   final String email;
-  final String password;
+  final String? password;
   final String address;
-  final int phone;
+  final String phone;
   final String? profilePicture;
   final bool isAdmin;
   final String? otpReset;

@@ -35,7 +35,7 @@ class SinglePostShimmer extends StatelessWidget {
               Column(
                 children: [
                   Container(
-                    color: Theme.of(context).primaryColorDark,
+                    color: Theme.of(context).canvasColor,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

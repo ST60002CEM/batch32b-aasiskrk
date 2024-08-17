@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:playforge/core/common/profile_shimmer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../app/constants/api_endpoint.dart';
 import '../../domain/entity/profile_entity.dart';
@@ -68,7 +69,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final profileState = ref.watch(profileViewModelProvider);
 
     if (profileState.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return ProfileShimmer();
     }
 
     if (profileState.error != null) {

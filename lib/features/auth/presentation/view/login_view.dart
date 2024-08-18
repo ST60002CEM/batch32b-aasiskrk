@@ -1,28 +1,25 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:playforge/core/common/custom_elevated_button.dart';
 import 'package:playforge/core/common/custom_snackbar.dart';
-import 'package:playforge/features/auth/presentation/view/register_view.dart';
 import 'package:playforge/features/auth/presentation/viewmodel/auth_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/common/cutom_textform_field.dart';
 import '../../../../core/common/my_snackbar.dart';
-import '../../../dashboard/presentation/view/dashboard_screen.dart';
 
 class LoginView extends ConsumerStatefulWidget {
-  const LoginView({super.key});
+  const LoginView({Key? key}) : super(key: key);
 
   @override
   ConsumerState<LoginView> createState() => _LoginViewState();
 }
 
 class _LoginViewState extends ConsumerState<LoginView> {
-  TextEditingController emailFieldController = TextEditingController();
-  TextEditingController passwordFieldController = TextEditingController();
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController emailFieldController = TextEditingController();
+  final TextEditingController passwordFieldController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final LocalAuthentication _localAuth = LocalAuthentication();
   bool _canCheckBiometrics = false;
@@ -36,6 +33,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
     _authenticateWithFingerprintIfEnabled();
   }
 
+  // ... (keep all the existing methods like _checkBiometrics, _loadFingerprintPreference, etc.)
   Future<void> _checkBiometrics() async {
     _canCheckBiometrics = await _localAuth.canCheckBiometrics;
   }
@@ -113,10 +111,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
         body: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             if (constraints.maxWidth < 600) {
-              // Mobile layout
               return _buildMobileLayout();
             } else {
-              // Tablet layout
               return _buildTabletLayout();
             }
           },
@@ -126,41 +122,37 @@ class _LoginViewState extends ConsumerState<LoginView> {
   }
 
   Widget _buildMobileLayout() {
-    return Column(
-      children: [
-        Expanded(
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: Image.asset(
-              Theme.of(context).brightness == Brightness.dark
-                  ? 'assets/images/logowhite.png'
-                  : 'assets/images/logoblack.png',
-              width: MediaQuery.of(context).size.width * 0.4,
-              height: MediaQuery.of(context).size.width * 0.4,
-            ),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+          Image.asset(
+            Theme.of(context).brightness == Brightness.dark
+                ? 'assets/images/logowhite.png'
+                : 'assets/images/logoblack.png',
+            width: MediaQuery.of(context).size.width * 0.4,
+            height: MediaQuery.of(context).size.width * 0.4,
           ),
-        ),
-        Expanded(
-          flex: 2,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
-            child: Container(
-              decoration: BoxDecoration(
+          SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Card(
+              shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
-                color: Theme.of(context).cardColor,
               ),
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-              child: _buildForm(),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: _buildForm(),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildTabletLayout() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Expanded(
           child: Container(

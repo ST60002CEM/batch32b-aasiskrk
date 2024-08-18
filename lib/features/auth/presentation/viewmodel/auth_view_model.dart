@@ -15,23 +15,26 @@ import '../state/auth_state.dart';
 
 final authViewModelProvider = StateNotifierProvider<AuthViewModel, AuthState>(
   (ref) => AuthViewModel(
-      ref.read(dashboardViewNavigatorProvider),
-      ref.read(registerViewNavigatorProvider),
-      ref.read(loginViewNavigatorProvider),
-      ref.read(authUseCaseProvider),
-      ref.read(userSharedPrefsProvider)),
+    ref.read(dashboardViewNavigatorProvider),
+    ref.read(registerViewNavigatorProvider),
+    ref.read(loginViewNavigatorProvider),
+    ref.read(authUseCaseProvider),
+    // ref.read(userSharedPrefsProvider)
+  ),
 );
 
+final UserSharedPrefs userSharedPrefs = UserSharedPrefs();
+final LocalAuthentication _localAuth = LocalAuthentication();
+
 class AuthViewModel extends StateNotifier<AuthState> {
-  final LocalAuthentication _localAuth = LocalAuthentication();
-  final UserSharedPrefs userSharedPrefs;
-  AuthViewModel(this.dnavigator, this.rnavigator, this.lnavigator,
-      this.authUseCase, this.userSharedPrefs)
+  AuthViewModel(
+      this.dnavigator, this.rnavigator, this.lnavigator, this.authUseCase)
       : super(AuthState.initial());
   final AuthUseCase authUseCase;
   final LoginViewNavigator lnavigator;
   final RegisterViewNavigator rnavigator;
   final DashboardViewNavigator dnavigator;
+
   // final LoginViewNavigator navigator;
 
   Future<void> uploadImage(File? file) async {
@@ -61,7 +64,7 @@ class AuthViewModel extends StateNotifier<AuthState> {
       },
       (success) {
         state = state.copyWith(isLoading: false, error: null);
-        showMySnackBar(message: "Successfully registered");
+        // showMySnackBar(message: "Successfully registered");
         openLoginView();
       },
     );

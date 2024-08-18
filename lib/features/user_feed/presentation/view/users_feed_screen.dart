@@ -53,7 +53,7 @@ class _UsersFeedScreenState extends ConsumerState<UsersFeedScreen> {
 
     if (MediaQuery.of(context).orientation == Orientation.landscape) {
       noOfButtons = 4;
-      noOfPosts = 5;
+      noOfPosts = 2;
     } else {
       noOfButtons = 2;
       noOfPosts = 1;

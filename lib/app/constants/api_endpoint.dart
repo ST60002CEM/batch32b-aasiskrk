@@ -4,9 +4,11 @@ class ApiEndpoints {
   static const Duration connectionTimeout = Duration(seconds: 1000);
   static const Duration receiveTimeout = Duration(seconds: 1000);
 
-  static const String baseUrl = "http://192.168.1.66:5000/api/";
-  static const String imageBaseUrl = "http://192.168.1.66:5000/forum/";
-  static const String profileImageUrl = "http://192.168.1.66:5000/profile/";
+  static const String baseUrl = "https://testhosting-lwe7.onrender.com/api/";
+  static const String imageBaseUrl =
+      "https://testhosting-lwe7.onrender.com/forum/";
+  static const String profileImageUrl =
+      "https://testhosting-lwe7.onrender.com/profile/";
   //static const String baseUrl = "http://192.168.4.4:3000/api/v1/";
 
   static const limitPage = 5;

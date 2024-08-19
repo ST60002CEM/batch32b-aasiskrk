@@ -276,6 +276,11 @@ class _ForumViewState extends ConsumerState<ForumView> {
                                 child: const Text('Create Post'),
                               ),
                             ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Text(
+                                "Please update profile picture before adding post, it may cause error, goto profile page and tap above your username to upload a profile pic")
                           ],
                         ),
                       ),

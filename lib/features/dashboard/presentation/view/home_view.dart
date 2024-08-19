@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +8,7 @@ import 'package:playforge/features/dashboard/presentation/view/single_post_view.
 import 'package:playforge/features/forum/presentation/view/forum_view.dart';
 import 'package:playforge/features/dashboard/presentation/viewmodel/forum_view_model.dart';
 import 'package:playforge/features/forum/presentation/viewmodel/home_view_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/common/custom_game_card.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import '../../../../app/constants/api_endpoint.dart';
@@ -49,6 +51,22 @@ class _HomeViewState extends ConsumerState<HomeView> {
             category, // Use appropriate category if needed
             sectionPageToken,
           );
+    }
+  }
+
+  Future<void> _launchUrl(String url) async {
+    try {
+      final Uri uri = Uri.parse(url);
+      print('Attempting to launch URL: $url'); // Debug print
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        print('Cannot launch URL: $url'); // Debug print
+        // You might want to show a snackbar or dialog here
+      }
+    } catch (e) {
+      print('Error launching URL: $e'); // Debug print
+      // You might want to show a snackbar or dialog here
     }
   }
 
@@ -260,15 +278,23 @@ class _HomeViewState extends ConsumerState<HomeView> {
                                                   child: Row(
                                                     children: [
                                                       CircleAvatar(
+                                                        radius: 20,
                                                         backgroundImage:
                                                             NetworkImage(
-                                                          post.postedUserId
-                                                                      ?.profilePicture !=
-                                                                  null
-                                                              ? '${ApiEndpoints.profileImageUrl}${post.postedUserId?.profilePicture}'
-                                                              : 'https://via.placeholder.com/800x400',
+                                                          '${ApiEndpoints.profileImageUrl}${post.postedUserId?.profilePicture ?? ''}',
                                                         ),
-                                                        radius: 20,
+                                                        onBackgroundImageError:
+                                                            (_, __) {
+                                                          // Handle the error case if needed
+                                                        },
+                                                        child: post.postedUserId
+                                                                    ?.profilePicture ==
+                                                                null
+                                                            ? Image.network(
+                                                                'https://via.placeholder.com/800x400',
+                                                                fit: BoxFit
+                                                                    .cover)
+                                                            : null,
                                                       ),
                                                       const SizedBox(width: 10),
                                                       Expanded(
@@ -337,11 +363,23 @@ class _HomeViewState extends ConsumerState<HomeView> {
                                                   ),
                                                 ),
                                                 const SizedBox(height: 5),
-                                                Image.network(
-                                                  '${ApiEndpoints.imageBaseUrl}${post.postPicture ?? 'https://via.placeholder.com/800x400'}',
+                                                FadeInImage.assetNetwork(
+                                                  placeholder:
+                                                      'https://via.placeholder.com/800x400', // Local placeholder image asset
+                                                  image:
+                                                      '${ApiEndpoints.imageBaseUrl}${post.postPicture ?? ''}',
                                                   width: double.infinity,
                                                   height: 213,
                                                   fit: BoxFit.cover,
+                                                  imageErrorBuilder: (context,
+                                                      error, stackTrace) {
+                                                    return Image.network(
+                                                      'https://via.placeholder.com/800x400',
+                                                      width: double.infinity,
+                                                      height: 213,
+                                                      fit: BoxFit.cover,
+                                                    );
+                                                  },
                                                 ),
                                                 Padding(
                                                   padding:
@@ -447,7 +485,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
                                       controller: _searchController,
                                       onSubmitted: (value) => _searchGames(),
                                       decoration: InputDecoration(
-                                        hintText: 'Search for games...',
+                                        hintText:
+                                            'Search for games from Google play store',
                                         prefixIcon: Icon(Icons.search),
                                         border: OutlineInputBorder(
                                           borderRadius:
@@ -473,14 +512,58 @@ class _HomeViewState extends ConsumerState<HomeView> {
                                           crossAxisCount: noOfButtons,
                                           crossAxisSpacing: 5,
                                           mainAxisSpacing: 5,
-                                          childAspectRatio: 0.9,
+                                          childAspectRatio: 0.8,
                                         ),
                                         itemCount: forumState.games.length,
                                         itemBuilder: (context, index) {
                                           final game = forumState.games[index];
-                                          return CustomGameCard(
-                                            gameName: game.title,
-                                            gameImage: game.thumbnail,
+                                          return InkWell(
+                                            onTap: () => {
+                                              print(
+                                                  'Tapped on game: ${game.title}'), // Debug print
+                                              print(
+                                                  'URL to launch: ${game.link}'), // Debug print
+                                              _launchUrl(game.link)
+                                            },
+                                            child: Card(
+                                              elevation: 4.0,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12.0),
+                                              ),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.vertical(
+                                                            top:
+                                                                Radius.circular(
+                                                                    12.0)),
+                                                    child: Image.network(
+                                                      game.thumbnail,
+                                                      fit: BoxFit.cover,
+                                                      width: double.infinity,
+                                                      height: 150.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Text(
+                                                      game.title,
+                                                      style: TextStyle(
+                                                        fontSize: 16.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
                                           );
                                         },
                                       ),

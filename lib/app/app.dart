@@ -13,8 +13,7 @@ class App extends ConsumerWidget {
     return MaterialApp(
       navigatorKey: AppNavigator.navigatorKey,
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.system,
-      theme: getApplicationTheme(),
+      theme: getDarkTheme(),
       darkTheme: getDarkTheme(),
       home: const SplashView(),
     );
